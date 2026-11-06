@@ -1,0 +1,31 @@
+name: Relatório semanal
+
+on:
+  schedule:
+    - cron: "37 10 * * 1"     # segunda, 7h37 (horário de Brasília)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  relatorio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Gerar relatório
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python -m jn.relatorio >> "$GITHUB_STEP_SUMMARY"
+      - name: Salvar
+        run: |
+          git config user.name "jn-robo"
+          git config user.email "jn-robo@users.noreply.github.com"
+          git add relatorios
+          git diff --cached --quiet || git commit -m "Relatório semanal"
+          git pull --rebase && git push

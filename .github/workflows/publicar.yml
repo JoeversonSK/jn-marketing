@@ -1,0 +1,40 @@
+name: Publicar no Instagram
+
+on:
+  schedule:
+    - cron: "17 * * * *"      # de hora em hora (o GitHub pode atrasar alguns minutos)
+  push:
+    branches: [main]
+    paths: ["conteudo/**"]   # quando um post é adicionado ou aprovado
+  workflow_dispatch:          # botão "Run workflow" para rodar na hora
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Publicar o que está aprovado e no horário
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          MIDIA_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: python -m jn.publicar
+      - name: Salvar a fila atualizada
+        if: always()
+        run: |
+          git config user.name "jn-robo"
+          git config user.email "jn-robo@users.noreply.github.com"
+          git add -A conteudo publicado FILA.md
+          git diff --cached --quiet || git commit -m "Fila atualizada pelo robô"
+          git pull --rebase && git push

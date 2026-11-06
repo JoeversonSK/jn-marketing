@@ -1,0 +1,29 @@
+name: Renovar token do Instagram
+
+on:
+  schedule:
+    - cron: "23 13 1,15 * *"  # dias 1 e 15 de cada mês (o token vence em 60 dias)
+  workflow_dispatch:
+
+jobs:
+  renovar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Renovar e salvar no segredo IG_ACCESS_TOKEN
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          case "$IG_ACCESS_TOKEN" in IG*) ;; *) echo "Token do login unificado nao expira. Nada a fazer."; exit 0;; esac
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Falta o segredo GH_PAT (veja o passo 6 do README)."; exit 1
+          fi
+          python -m jn.renovar_token > novo_token.txt
+          echo "::add-mask::$(cat novo_token.txt)"
+          gh secret set IG_ACCESS_TOKEN --repo "$GITHUB_REPOSITORY" < novo_token.txt
+          rm -f novo_token.txt
