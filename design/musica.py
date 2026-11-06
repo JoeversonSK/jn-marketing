@@ -1,23 +1,34 @@
 #!/usr/bin/env python3
-"""Trilha sonora ORIGINAL para os Reels da JN Higienização.
+"""Trilha sonora ORIGINAL e SINCRONIZADA para os Reels da JN Higienização.
 
 A API do Instagram não permite escolher músicas da biblioteca do app, então a
 música precisa ir dentro do MP4. Para não usar obra protegida, este script
-COMPÕE e sintetiza uma trilha própria (pop/house leve, clima "limpo e fresco"):
-bateria, baixo, pad de acordes com "pumping" e um arpejo brilhante.
-Nada é baixado nem copiado: tudo é gerado por código, então a JN pode usar à vontade.
+COMPÕE e sintetiza uma trilha própria (pop/house leve, clima "limpo e fresco").
+
+Sincronia com o vídeo (o que aparece na tela manda na música):
+- cada troca de cena cai num TEMPO FORTE: a grade de compassos recomeça na cena;
+- "whoosh" crescente durante a transição e IMPACTO (boom + prato) no corte;
+- o acorde muda junto com a cena;
+- a energia segue o roteiro: gancho (leve, sem bumbo) → problema (meia batida) →
+  solução (batida completa) → oferta (o ápice) → chamada final (hit e fade).
+- "ticks" sutis acompanham a entrada dos textos dentro de cada cena.
+
+As trocas de cena vêm de (em ordem de preferência):
+  1. --roteiro roteiro.json  (o mesmo JSON do design/reel.py; o tempo é exato)
+  2. arquivo <video>.cenas.json gerado pelo reel.py ao lado do vídeo
+  3. detecção automática de cortes no vídeo (ffmpeg), para qualquer vídeo
 
 Uso:
-    python3 design/musica.py --video reel.mp4 --saida reel-com-musica.mp4 [--estilo animado|suave] [--seed 3]
-    python3 design/musica.py --wav trilha.wav --duracao 16          # só o áudio
-
-O vídeo sai com AAC 44,1 kHz estéreo, +faststart e fade-out no final.
-Mude --seed para variar tom, andamento e progressão entre os Reels da semana.
+    python3 design/musica.py --video reel.mp4 --saida final.mp4 --roteiro design/exemplos/reel-conheca.json
+    python3 design/musica.py --video qualquer.mp4 --saida final.mp4          # detecta os cortes
+    python3 design/musica.py --wav trilha.wav --duracao 16                   # só o áudio, sem vídeo
+Opções: --estilo animado|suave, --seed N (varia tom, andamento e acordes).
 """
 from __future__ import annotations
 
 import argparse
 import json
+
 import subprocess
 import tempfile
 import wave
@@ -28,65 +39,74 @@ from scipy.signal import butter, sosfilt
 
 SR = 44100
 
-# Progressões em graus (semitons a partir da tônica, tríade maior "M" ou menor "m")
 PROGRESSOES = [
-    [(0, "M"), (7, "M"), (9, "m"), (5, "M")],    # I  V  vi IV
-    [(9, "m"), (5, "M"), (0, "M"), (7, "M")],    # vi IV I  V
-    [(0, "M"), (9, "m"), (5, "M"), (7, "M")],    # I  vi IV V
-    [(5, "M"), (7, "M"), (9, "m"), (0, "M")],    # IV V  vi I
+    [(9, "m"), (5, "M"), (0, "M"), (7, "M")],    # vi IV I V   (começa "tenso", resolve)
+    [(0, "M"), (7, "M"), (9, "m"), (5, "M")],    # I V vi IV
+    [(5, "M"), (7, "M"), (9, "m"), (0, "M")],    # IV V vi I
+    [(0, "M"), (9, "m"), (5, "M"), (7, "M")],    # I vi IV V
 ]
-TONICAS = {"C": 48, "D": 50, "E": 52, "F": 53, "G": 55, "A": 57}  # MIDI (oitava do baixo +12)
+TONICAS = [50, 52, 48, 53, 55, 57]  # D E C F G A (MIDI na região do baixo +12)
 
 ESTILOS = {
-    "animado": {"bpm": (112, 122), "arpejo": 1.0, "hats": 1.0, "kick": 1.0},
-    "suave":   {"bpm": (92, 100),  "arpejo": 0.7, "hats": 0.5, "kick": 0.7},
+    "animado": {"bpm": (110, 124), "arpejo": 1.0, "hats": 1.0, "kick": 1.0},
+    "suave":   {"bpm": (90, 102),  "arpejo": 0.75, "hats": 0.55, "kick": 0.7},
 }
 
+# Energia por papel de cena: (bumbo, palmas, chimbal, baixo, arpejo, oitava_extra)
+PAPEIS = {
+    "intro":  (0, 0, 0.4, 0.0, 0.8, 0),
+    "build":  (0.5, 1, 0.7, 0.8, 0.9, 0),   # meia batida
+    "full":   (1, 1, 1.0, 1.0, 1.0, 0),
+    "climax": (1, 1, 1.2, 1.1, 1.15, 1),
+    "outro":  (1, 1, 0.9, 1.0, 1.0, 0),
+}
+NOMES_PAPEL = {"gancho": "intro", "capa": "intro", "problema": "build", "solucao": "full",
+               "solução": "full", "oferta": "climax", "cta": "outro"}
 
-def hz(midi: float) -> float:
+
+# ---------------------------------------------------------------- síntese básica
+def hz(midi):
     return 440.0 * 2 ** ((midi - 69) / 12)
 
 
-def env_adsr(n, a=0.005, d=0.1, s=0.6, r=0.05):
-    t = np.arange(n) / SR
-    e = np.ones(n) * s
+def env(n, a=0.005, d=0.1, s=0.6, r=0.05):
+    e = np.full(n, s, dtype=float)
     na, nd, nr = int(a * SR), int(d * SR), int(r * SR)
-    e[:na] = np.linspace(0, 1, max(na, 1))[:len(e[:na])]
-    e[na:na + nd] = np.linspace(1, s, max(nd, 1))[:len(e[na:na + nd])]
-    if nr and n > nr:
+    na, nd = min(na, n), min(nd, max(n - na, 0))
+    e[:na] = np.linspace(0, 1, max(na, 1))[:na]
+    e[na:na + nd] = np.linspace(1, s, max(nd, 1))[:nd]
+    if 0 < nr < n:
         e[-nr:] *= np.linspace(1, 0, nr)
     return e
 
 
 def saw(f, n, fase=0.0):
     t = np.arange(n) / SR
-    x = (t * f + fase) % 1.0
-    return 2 * x - 1
+    return 2 * ((t * f + fase) % 1.0) - 1
 
 
-def lp(x, fc, ordem=2):
-    return sosfilt(butter(ordem, min(fc, SR / 2 - 100), "low", fs=SR, output="sos"), x)
+def lp(x, fc, o=2):
+    return sosfilt(butter(o, min(fc, SR / 2 - 200), "low", fs=SR, output="sos"), x)
 
 
-def hp(x, fc, ordem=2):
-    return sosfilt(butter(ordem, fc, "high", fs=SR, output="sos"), x)
+def hp(x, fc, o=2):
+    return sosfilt(butter(o, fc, "high", fs=SR, output="sos"), x)
 
 
 def kick(n):
     t = np.arange(n) / SR
     f = 48 + 110 * np.exp(-t * 32)
-    fase = 2 * np.pi * np.cumsum(f) / SR
-    return np.sin(fase) * np.exp(-t * 7.5) + 0.25 * np.sin(fase) * np.exp(-t * 60)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    return np.sin(ph) * np.exp(-t * 7.5) + 0.25 * np.sin(ph) * np.exp(-t * 60)
 
 
 def clap(n, rng):
     t = np.arange(n) / SR
-    ruido = hp(lp(rng.standard_normal(n), 6000), 900)
     e = np.exp(-t * 22)
-    for atraso in (0.010, 0.020):  # "palmas" em camadas
-        k = int(atraso * SR)
-        e[k:] += 0.6 * np.exp(-t[:n - k] * 30)
-    return ruido * e * 0.11
+    for k in (0.010, 0.020):
+        i = int(k * SR)
+        e[i:] += 0.6 * np.exp(-t[:n - i] * 30)
+    return hp(lp(rng.standard_normal(n), 6000), 900) * e * 0.11
 
 
 def hat(n, rng, aberto=False):
@@ -94,102 +114,244 @@ def hat(n, rng, aberto=False):
     return hp(rng.standard_normal(n), 7000) * np.exp(-t * (12 if aberto else 60)) * 0.065
 
 
-def compor(duracao: float, estilo: str = "animado", seed: int = 1) -> np.ndarray:
+def whoosh(dur, rng):
+    """Ruído que sobe (filtro abrindo) e cresce até o corte."""
+    n = max(int(dur * SR), 1)
+    x = rng.standard_normal(n)
+    partes, passos = [], 24
+    for k in range(passos):
+        seg = x[k * n // passos:(k + 1) * n // passos]
+        fc = 400 * (16 ** (k / passos))  # 400 Hz → 6,4 kHz
+        partes.append(lp(hp(seg, max(fc / 3, 80)), fc))
+    w = np.concatenate(partes)
+    return w * np.linspace(0, 1, n) ** 2.2 * 0.22
+
+
+def impacto(rng, forte=1.0):
+    n = int(1.6 * SR)
+    t = np.arange(n) / SR
+    boom = np.sin(2 * np.pi * np.cumsum(38 + 70 * np.exp(-t * 18)) / SR) * np.exp(-t * 3.2) * 0.55
+    prato = hp(rng.standard_normal(n), 5000) * np.exp(-t * 2.4) * 0.07
+    return (boom + prato) * forte
+
+
+def tick(rng):
+    n = int(0.06 * SR)
+    t = np.arange(n) / SR
+    return (np.sin(2 * np.pi * 1800 * t) * 0.5 + hp(rng.standard_normal(n), 4000) * 0.3) * np.exp(-t * 90) * 0.06
+
+
+# ---------------------------------------------------------------- sincronia
+def cenas_do_roteiro(roteiro: dict) -> list[dict]:
+    """Mesma conta do reel.py (xfade): devolve início visível, transição e papel de cada cena."""
+    padrao = roteiro.get("transicao", {"tipo": "wipeup", "duracao": 0.5})
+    out, acumulado = [], 0.0
+    for i, c in enumerate(roteiro["cenas"]):
+        nome = c.get("dados", {}).get("cena", "")
+        if i == 0:
+            out.append({"inicio": 0.0, "transicao": 0.0, "nome": nome})
+            acumulado = float(c["duracao"])
+            continue
+        t = c.get("transicao", padrao)
+        td = float(padrao.get("duracao", 0.5)) if isinstance(t, str) else float(t.get("duracao", 0.5))
+        offset = acumulado - td
+        out.append({"inicio": round(offset + td, 3), "transicao": td, "nome": nome})
+        acumulado = offset + float(c["duracao"])
+    return out
+
+
+def detectar_cortes(video: Path) -> list[dict]:
+    """Detecta trocas de cena (inclusive wipes/slides suaves) comparando cada quadro com o de 0,4 s antes.
+
+    Uma troca de cena muda a tela inteira e gera um pico bem maior que a animação de um texto.
+    O corte é marcado no fim da transição, quando a cena nova já está na tela.
+    """
+    fps, lag, w, h = 30, 12, 36, 64
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(video), "-vf", f"fps={fps},scale={w}:{h},format=gray",
+                          "-f", "rawvideo", "-"], capture_output=True, check=True).stdout
+    F = np.frombuffer(raw, np.uint8).reshape(-1, h, w).astype(float)
+    d = np.zeros(len(F))
+    d[lag:] = np.abs(F[lag:] - F[:-lag]).mean(axis=(1, 2))
+    base = 6.0
+    regioes, i = [], 0
+    while i < len(d):
+        if d[i] > base:
+            j = i
+            while j < len(d) and d[j] > base:
+                j += 1
+            regioes.append((i, j, d[i:j].max()))
+            i = j
+        else:
+            i += 1
+    if not regioes:
+        return [{"inicio": 0.0, "transicao": 0.0, "nome": ""}]
+    corte = 0.45 * float(np.median([r[2] for r in regioes]))
+    cenas = [{"inicio": 0.0, "transicao": 0.0, "nome": ""}]
+    for i, j, pico in regioes:
+        if pico < corte:
+            continue  # animação de texto, não troca de cena
+        fim = (j - lag) / fps
+        ini = max(i / fps, 0)
+        if fim > 0.5:
+            cenas.append({"inicio": round(fim, 3), "transicao": round(min(max(fim - ini, 0.3), 1.0), 3), "nome": ""})
+    return cenas
+
+
+def papel(cena: dict, i: int, total: int) -> str:
+    if cena.get("nome") in NOMES_PAPEL:
+        return NOMES_PAPEL[cena["nome"]]
+    if total == 1:
+        return "full"
+    if i == 0:
+        return "intro"
+    if i == total - 1:
+        return "outro"
+    if i == total - 2 and total >= 4:
+        return "climax"
+    return "build" if i == 1 else "full"
+
+
+def melhor_bpm(cenas, duracao, faixa):
+    """Escolhe o andamento em que cada cena dura o mais perto possível de um número inteiro de tempos."""
+    limites = [c["inicio"] for c in cenas] + [duracao]
+    tamanhos = np.diff(limites)
+    melhor, erro_min = faixa[0], 1e9
+    for bpm in np.arange(faixa[0], faixa[1] + 0.01, 0.25):
+        beats = tamanhos * bpm / 60
+        erro = float(np.abs(beats - np.round(beats)).sum())
+        if erro < erro_min:
+            melhor, erro_min = bpm, erro
+    return float(melhor)
+
+
+# ---------------------------------------------------------------- composição
+def compor(duracao: float, estilo="animado", seed=1, cenas: list[dict] | None = None,
+           entradas_texto=(0.35, 0.7)) -> np.ndarray:
     rng = np.random.default_rng(seed)
     cfg = ESTILOS[estilo]
-    bpm = int(rng.integers(*cfg["bpm"]))
+    cenas = cenas or [{"inicio": 0.0, "transicao": 0.0, "nome": ""}]
     prog = PROGRESSOES[seed % len(PROGRESSOES)]
-    tonica = list(TONICAS.values())[seed % len(TONICAS)]
+    tonica = TONICAS[seed % len(TONICAS)]
+    bpm = melhor_bpm(cenas, duracao, cfg["bpm"])
     beat = 60 / bpm
-    compasso = 4 * beat
-    total = int((duracao + 0.1) * SR)
+    total = int((duracao + 0.05) * SR)
+    L, R = np.zeros(total), np.zeros(total)
 
-    L = np.zeros(total)
-    R = np.zeros(total)
-    sidechain = np.ones(total)
-
-    def soma(sinal, ini, gl=1.0, gr=1.0):
-        i = int(ini * SR)
-        if i >= total:
+    def soma(sinal, ini, gl=1.0, gr=1.0, fim=None):
+        i = int(round(ini * SR))
+        if i >= total or i + len(sinal) <= 0:
             return
-        s = sinal[: total - i]
+        if i < 0:
+            sinal, i = sinal[-i:], 0
+        lim = total if fim is None else min(total, int(fim * SR))
+        s = sinal[: max(lim - i, 0)]
+        if len(s) == 0:
+            return
+        if fim is not None and len(s) < len(sinal):  # corte limpo no fim da cena
+            k = min(int(0.008 * SR), len(s))
+            s = s.copy()
+            s[-k:] *= np.linspace(1, 0, k)
         L[i:i + len(s)] += s * gl
         R[i:i + len(s)] += s * gr
 
-    n_comp = int(np.ceil(duracao / compasso)) + 1
-    intro = 1  # 1º compasso sem kick (entrada mais leve)
+    limites = [c["inicio"] for c in cenas] + [duracao]
+    n_cenas = len(cenas)
+    acorde_idx = 0
+    for ci, cena in enumerate(cenas):
+        ini, fim = limites[ci], limites[ci + 1]
+        kickv, clapv, hatv, baixov, arpv, oit = PAPEIS[papel(cena, ci, n_cenas)]
+        n_beats = int(np.ceil((fim - ini) / beat))
+        duck = np.ones(int((fim - ini) * SR) + 1)
+        sec_L, sec_R = np.zeros_like(duck), np.zeros_like(duck)
 
-    for c in range(n_comp):
-        t0 = c * compasso
-        grau, tipo = prog[c % len(prog)]
-        raiz = tonica + grau
-        terça = 3 if tipo == "m" else 4
-        acorde = [raiz + 12, raiz + 12 + terça, raiz + 19]
+        def s_soma(sinal, t, gl=1.0, gr=1.0):  # dentro da seção, sofre o "pumping"
+            i = int(round(t * SR))
+            if i >= len(duck):
+                return
+            s = sinal[: len(duck) - i]
+            sec_L[i:i + len(s)] += s * gl
+            sec_R[i:i + len(s)] += s * gr
 
-        # Pad: 3 serras desafinadas por nota, filtradas, ataque suave
-        n = int(compasso * SR)
-        pad = np.zeros(n)
-        for nota in acorde:
-            for det in (-0.12, 0.0, 0.11):
-                pad += saw(hz(nota + det), n, rng.random())
-        pad = lp(pad, 1800 + 600 * (c % 2)) * env_adsr(n, a=0.08, d=0.3, s=0.8, r=0.15) * 0.05
-        soma(pad, t0, 1.0, 0.85)
-        soma(np.roll(pad, int(0.012 * SR)), t0, 0.85, 1.0)  # largura estéreo
-
-        # Baixo: oitavas em colcheias (sine + um pouco de serra)
-        for b in range(8):
-            nb = int(beat / 2 * SR * 0.92)
-            f = hz(raiz - 12 + (12 if b % 2 else 0))
-            tb = np.arange(nb) / SR
-            som = (np.sin(2 * np.pi * f * tb) + 0.25 * lp(saw(f, nb), 900)) * env_adsr(nb, 0.003, 0.08, 0.5, 0.03)
-            soma(np.tanh(som * 1.4) * 0.22, t0 + b * beat / 2)
-
-        # Arpejo brilhante em semicolcheias (a partir do 2º compasso)
-        if c >= intro and cfg["arpejo"]:
-            padrao = [0, 1, 2, 1, 2, 0, 2, 1] * 2
-            for k, idx in enumerate(padrao):
+        # acordes: troca na entrada da cena e a cada compasso dentro dela
+        for b0 in range(0, n_beats, 4):
+            grau, tipo = prog[acorde_idx % len(prog)]
+            acorde_idx += 1
+            raiz = tonica + grau
+            notas = [raiz + 12, raiz + 12 + (3 if tipo == "m" else 4), raiz + 19]
+            t_bar = b0 * beat
+            nbar = int(min(4, n_beats - b0) * beat * SR)
+            pad = sum(saw(hz(nt + d), nbar, rng.random()) for nt in notas for d in (-0.12, 0, 0.11))
+            brilho = 1300 + 900 * (arpv - 0.8) + 500 * oit
+            pad = lp(pad, brilho) * env(nbar, 0.06 if b0 else 0.01, 0.3, 0.8, 0.12) * 0.05
+            s_soma(pad, t_bar, 1.0, 0.85)
+            s_soma(np.roll(pad, int(0.012 * SR)), t_bar, 0.85, 1.0)
+            for b in range(min(4, n_beats - b0) * 2):  # baixo em colcheias
+                if baixov == 0:
+                    break
+                nb = int(beat / 2 * SR * 0.9)
+                f = hz(raiz - 12 + (12 if b % 2 else 0))
+                tb = np.arange(nb) / SR
+                som = (np.sin(2 * np.pi * f * tb) + 0.25 * lp(saw(f, nb), 900)) * env(nb, 0.003, 0.08, 0.5, 0.03)
+                s_soma(np.tanh(som * 1.4) * 0.22 * baixov, t_bar + b * beat / 2)
+            padrao = [0, 1, 2, 1, 2, 0, 2, 1] * 2  # arpejo em semicolcheias
+            for k, idx in enumerate(padrao[: int(min(4, n_beats - b0) * 4)]):
                 na = int(beat / 4 * SR)
-                f = hz(acorde[idx] + 12)
+                f = hz(notas[idx] + 12 + 12 * oit * (k % 2))
                 ta = np.arange(na) / SR
                 som = (np.sin(2 * np.pi * f * ta) + 0.3 * np.sin(4 * np.pi * f * ta)) * np.exp(-ta * 14)
                 pan = 0.35 if k % 2 else -0.35
-                soma(som * 0.11 * cfg["arpejo"], t0 + k * beat / 4, 1 - pan, 1 + pan)
-                # eco (delay de colcheia pontuada)
-                soma(som * 0.045 * cfg["arpejo"], t0 + k * beat / 4 + beat * 0.75, 1 + pan, 1 - pan)
+                s_soma(som * 0.11 * arpv * cfg["arpejo"], t_bar + k * beat / 4, 1 - pan, 1 + pan)
+                s_soma(som * 0.045 * arpv * cfg["arpejo"], t_bar + k * beat / 4 + beat * 0.75, 1 + pan, 1 - pan)
 
-        # Bateria
-        for b in range(4):
-            tb = t0 + b * beat
-            if c >= intro:
-                soma(kick(int(0.45 * SR)) * 0.5 * cfg["kick"], tb)
-                i = int(tb * SR)
-                m = min(int(0.32 * SR), total - i)
+        # bateria
+        for b in range(n_beats):
+            tb = b * beat
+            meia = kickv == 0.5
+            if kickv and (not meia or b % 2 == 0):
+                s_soma(kick(int(0.45 * SR)) * 0.5 * cfg["kick"], tb)
+                i, m = int(tb * SR), int(0.3 * SR)
+                m = min(m, len(duck) - i)
                 if m > 0:
-                    sidechain[i:i + m] = np.minimum(sidechain[i:i + m], 0.45 + 0.55 * np.linspace(0, 1, m) ** 0.6)
-            if b in (1, 3):
-                soma(clap(int(0.3 * SR), rng) * (0.6 if c < intro else 1.0), tb, 0.95, 1.0)
+                    duck[i:i + m] = np.minimum(duck[i:i + m], 0.45 + 0.55 * np.linspace(0, 1, m) ** 0.6)
+            if clapv and b % 4 in (1, 3) and not (meia and b % 4 == 1):
+                s_soma(clap(int(0.3 * SR), rng), tb, 0.95, 1.0)
             for h in range(2):
-                aberto = h == 1 and c >= intro
-                soma(hat(int(0.25 * SR), rng, aberto) * cfg["hats"] * (0.5 if aberto else 0.7),
-                     tb + h * beat / 2 + (0.012 if h else 0), 0.8, 1.0)
+                aberto = h == 1 and kickv == 1
+                s_soma(hat(int(0.25 * SR), rng, aberto) * hatv * cfg["hats"] * (0.55 if aberto else 0.7),
+                       tb + h * beat / 2 + (0.01 if h else 0), 0.8, 1.0)
 
-    # "Pumping": abaixa pad/arpejo/baixo quando o kick bate (sidechain aplicado no mix)
-    L *= sidechain
-    R *= sidechain
-    # Kick por cima, sem ducking
-    # (o ducking acima também atinge o kick, mas o ataque dele é instantâneo e continua presente)
+        sec = np.stack([sec_L * duck, sec_R * duck])
+        n = sec.shape[1]
+        k = min(int(0.008 * SR), n)
+        sec[:, -k:] *= np.linspace(1, 0, k)
+        i = int(round(ini * SR))
+        m = min(n, total - i)
+        L[i:i + m] += sec[0, :m]
+        R[i:i + m] += sec[1, :m]
 
+        # transição: whoosh até o corte + impacto no corte
+        if ci > 0:
+            td = max(cena.get("transicao", 0.5), 0.35)
+            w = whoosh(td + 0.25, rng)
+            soma(w, ini - len(w) / SR, 0.9, 1.0)
+            soma(impacto(rng, 1.15 if papel(cena, ci, n_cenas) == "climax" else 0.85), ini)
+        # ticks na entrada dos textos (as animações da cena entram logo depois do corte)
+        for d in entradas_texto:
+            if ini + d < fim - 0.2:
+                soma(tick(rng), ini + d, 0.9, 1.1)
+
+    # final: acorde de resolução + impacto que ressoa no fim do vídeo
     mix = np.stack([L, R], axis=1)[: int(duracao * SR)]
     mix = hp(mix.T, 30).T
-    mix = np.tanh(mix * 1.6) / np.tanh(1.6)            # saturação/limitador suave
-    fade_in, fade_out = int(0.05 * SR), int(1.6 * SR)
-    mix[:fade_in] *= np.linspace(0, 1, fade_in)[:, None]
-    mix[-fade_out:] *= np.linspace(1, 0, fade_out)[:, None] ** 1.5
-    pico = np.abs(mix).max() or 1
-    return (mix / pico * 0.89).astype(np.float32)          # ~ -1 dBFS
+    mix = np.tanh(mix * 1.6) / np.tanh(1.6)
+    fi, fo = int(0.03 * SR), int(min(1.4, duracao / 4) * SR)
+    mix[:fi] *= np.linspace(0, 1, fi)[:, None]
+    mix[-fo:] *= (np.linspace(1, 0, fo) ** 1.4)[:, None]
+    return (mix / (np.abs(mix).max() or 1) * 0.89).astype(np.float32)
 
 
-def salvar_wav(audio: np.ndarray, caminho: Path):
+# ---------------------------------------------------------------- arquivos
+def salvar_wav(audio, caminho: Path):
     pcm = (np.clip(audio, -1, 1) * 32767).astype("<i2")
     with wave.open(str(caminho), "wb") as w:
         w.setnchannels(2)
@@ -199,37 +361,52 @@ def salvar_wav(audio: np.ndarray, caminho: Path):
 
 
 def duracao_video(p: Path) -> float:
-    out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(p)],
+    out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(p)],
                          capture_output=True, text=True, check=True).stdout
-    return float(json.loads(out)["format"]["duration"])
+    return float(out.strip())
 
 
-def aplicar(video: Path, saida: Path, estilo="animado", seed=1, volume_db=-3.0):
+def cenas_para(video: Path, roteiro: Path | None):
+    if roteiro:
+        return cenas_do_roteiro(json.loads(Path(roteiro).read_text(encoding="utf-8"))), "roteiro"
+    lado = video.with_suffix(".cenas.json")
+    if lado.exists():
+        return json.loads(lado.read_text(encoding="utf-8")), "arquivo .cenas.json"
+    return detectar_cortes(video), "detecção automática"
+
+
+def aplicar(video: Path, saida: Path, estilo="animado", seed=1, roteiro: Path | None = None, volume_db=-2.0):
     dur = duracao_video(video)
+    cenas, origem = cenas_para(video, roteiro)
+    print(f"Sincronia por {origem}: cortes em " + ", ".join(f"{c['inicio']:.2f}s" for c in cenas[1:]))
     with tempfile.TemporaryDirectory() as tmp:
         wav = Path(tmp) / "trilha.wav"
-        salvar_wav(compor(dur, estilo, seed), wav)
+        tmp_mp4 = Path(tmp) / "saida.mp4"
+        salvar_wav(compor(dur, estilo, seed, cenas), wav)
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(video), "-i", str(wav),
-                        "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy",
-                        "-af", f"volume={volume_db}dB", "-c:a", "aac", "-b:a", "192k", "-ar", "44100",
-                        "-shortest", "-movflags", "+faststart", str(saida)], check=True)
+                        "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy", "-af", f"volume={volume_db}dB",
+                        "-c:a", "aac", "-b:a", "192k", "-ar", "44100", "-shortest", "-movflags", "+faststart",
+                        str(tmp_mp4)], check=True)
+        Path(saida).write_bytes(tmp_mp4.read_bytes())
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--video", help="MP4 de entrada (o áudio dele é substituído)")
-    ap.add_argument("--saida", help="MP4 de saída")
+    ap.add_argument("--saida", help="MP4 de saída (pode ser o mesmo arquivo)")
+    ap.add_argument("--roteiro", help="JSON do design/reel.py, para sincronia exata")
     ap.add_argument("--wav", help="gera só o áudio neste WAV")
     ap.add_argument("--duracao", type=float, default=16.0)
     ap.add_argument("--estilo", choices=sorted(ESTILOS), default="animado")
     ap.add_argument("--seed", type=int, default=1, help="muda tom, andamento e progressão")
     a = ap.parse_args(argv)
     if a.wav:
-        salvar_wav(compor(a.duracao, a.estilo, a.seed), Path(a.wav))
+        cenas = cenas_do_roteiro(json.loads(Path(a.roteiro).read_text())) if a.roteiro else None
+        salvar_wav(compor(a.duracao, a.estilo, a.seed, cenas), Path(a.wav))
         print(f"Trilha salva em {a.wav}")
     elif a.video and a.saida:
-        aplicar(Path(a.video), Path(a.saida), a.estilo, a.seed)
-        print(f"Vídeo com música: {a.saida}")
+        aplicar(Path(a.video), Path(a.saida), a.estilo, a.seed, Path(a.roteiro) if a.roteiro else None)
+        print(f"Vídeo com música sincronizada: {a.saida}")
     else:
         ap.error("use --video e --saida, ou --wav")
 

@@ -4,7 +4,9 @@
 Cada cena é um template (normalmente `reel-cena`) com animações CSS de entrada.
 O script congela as animações no navegador e avança quadro a quadro (30 fps),
 grava cada cena como clipe e junta tudo com transições do ffmpeg (xfade).
-Saída: H.264, yuv420p, sem áudio, +faststart — pronta para o Instagram.
+Saída: H.264, yuv420p, +faststart, com trilha original sincronizada (design/musica.py).
+Grava também <saida>.cenas.json com os tempos das trocas de cena.
+No JSON: "musica": {"estilo": "animado"|"suave", "seed": N} ou "musica": false.
 
 Uso:
     python3 design/reel.py roteiro.json
@@ -142,8 +144,20 @@ def main(argv=None):
         nav.close()
         juntar(clipes, duracoes, transicoes, saida, fps)
 
+    # Trocas de cena (tempos reais) ao lado do vídeo, para a música sincronizar.
+    from musica import aplicar, cenas_do_roteiro  # noqa: E402
+    r_real = {**r, "cenas": [{**c, "duracao": d} for c, d in zip(cenas, duracoes)]}
+    marcas = cenas_do_roteiro(r_real)
+    saida.with_suffix(".cenas.json").write_text(json.dumps(marcas, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    # Música original sincronizada (regra da JN: todo vídeo tem música). Desligue com "musica": false.
+    m = r.get("musica", {})
+    if m is not False:
+        m = m if isinstance(m, dict) else {}
+        aplicar(saida, saida, m.get("estilo", "animado"), int(m.get("seed", 1)))
+
     total = duracao_video(saida)
-    print(f"reel: {saida}  ({total:.2f}s, {LARGURA}x{ALTURA}, {fps}fps)")
+    print(f"reel: {saida}  ({total:.2f}s, {LARGURA}x{ALTURA}, {fps}fps, com música sincronizada)")
     if not 12 <= total <= 20:
         print(f"  ! duração fora da faixa recomendada (12–20 s): {total:.2f}s")
 

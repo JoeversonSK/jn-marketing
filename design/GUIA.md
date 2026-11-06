@@ -154,12 +154,18 @@ Marcação nos textos: `*acento*`, `_limão_`, `\n` (quebra de linha), `~` (espa
 ## Música dos Reels
 
 A API do Instagram não permite escolher músicas da biblioteca do app. Por isso a trilha vai dentro do MP4.
-Nunca use música comercial ou de terceiros. Use sempre a trilha original gerada por `design/musica.py`:
+Nunca use música comercial ou de terceiros. A trilha é composta por código em `design/musica.py` e é **sincronizada com o vídeo**:
 
-```
-python3 design/musica.py --video reel.mp4 --saida reel-final.mp4 --estilo animado --seed N
-```
+- cada troca de cena cai num tempo forte, com "whoosh" na transição e impacto no corte;
+- o acorde muda junto com a cena, e a energia segue o roteiro: gancho leve → problema → solução → oferta (ápice) → chamada final;
+- ticks sutis acompanham a entrada dos textos.
 
-- `--estilo animado` (112–122 BPM) para oferta, agenda e lançamento; `--estilo suave` (92–100 BPM) para dicas e conteúdo educativo.
-- Mude o `--seed` a cada Reel (ex.: número da semana) para variar tom, andamento e acordes.
-- O script já entrega AAC estéreo, fade-out no final e +faststart, pronto para a fila.
+O `design/reel.py` já aplica a música sozinho. No JSON do roteiro, use `"musica": {"estilo": "animado", "seed": N}`
+(`animado` para oferta, agenda e lançamento; `suave` para dicas) e mude o `seed` a cada Reel.
+Nomeie as cenas como `gancho`, `problema`, `solucao`, `oferta` e `cta` para a energia seguir o roteiro.
+
+Para um vídeo que não saiu do reel.py (ex.: vídeo real do serviço):
+```
+python3 design/musica.py --video video.mp4 --saida final.mp4 --estilo animado --seed N
+```
+Os cortes são detectados automaticamente. Com o roteiro, use `--roteiro roteiro.json` para tempo exato.
