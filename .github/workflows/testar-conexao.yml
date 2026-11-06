@@ -1,0 +1,23 @@
+name: Testar conexão com o Instagram
+
+on:
+  workflow_dispatch:   # botão "Run workflow" — não publica nada
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Verificar token e conta
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python -m jn.verificar
+      - name: Conferir se as imagens estão no ar (GitHub Pages)
+        run: |
+          URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/conteudo/2026-11-09-1900-post-inauguracao/01.jpg"
+          curl -sI "$URL" | head -1
