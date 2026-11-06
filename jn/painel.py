@@ -8,6 +8,7 @@ ICONES = {
     "aprovado": "🟢 aprovado",
     "publicado": "✅ publicado",
     "falhou": "🔴 falhou",
+    "recusado": "⛔ recusado",
 }
 
 
@@ -33,7 +34,7 @@ def atualizar() -> None:
     linhas = [
         "# Fila de conteúdo — JN Higienização",
         "",
-        "Para liberar um post: abra o `post.json` da pasta e troque `\"aprovado\": false` por `true`.",
+        "Para aprovar, use o app no celular: https://joeversonsk.github.io/jn-marketing/app/",
         "O sistema publica sozinho quando chegar o horário (confere a cada hora).",
         "",
         "## Programados",

@@ -159,3 +159,11 @@ def test_token_instagram_usa_graph_instagram():
     fake = FakeHTTP()
     ig = instagram.Instagram("IGQVJ_teste", sessao=fake)
     assert ig.ig_id == "999" and ig.base.startswith("https://graph.instagram.com/")
+
+
+def test_recusado_nao_publica(raiz):
+    it = criar(raiz, "rec")
+    it.dados["recusado"] = True
+    it.salvar()
+    assert fila.prontos_para_publicar() == []
+    assert fila.carregar()[0].status == "recusado"

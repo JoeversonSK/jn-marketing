@@ -48,6 +48,8 @@ class Item:
     def status(self) -> str:
         if self.dados.get("media_id"):
             return "publicado"
+        if self.dados.get("recusado"):
+            return "recusado"
         if self.dados.get("falhou"):
             return "falhou"
         if not self.dados.get("aprovado"):
