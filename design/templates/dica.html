@@ -1,0 +1,51 @@
+<!doctype html>
+<!--
+  Template: dica  (1080x1350)
+  Card de dica avulsa (post único ou card de carrossel).
+  Campos: rotulo ("Dica JN"), titulo, texto, icone, destaque (frase curta em caixa, opcional), instagram, cidades, tema (gelo|noite|royal)
+-->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .d-dica .cabeca { display: flex; align-items: center; gap: 36px; margin-top: 110px; }
+  .d-dica .titulo { font-size: 104px; margin-top: 60px; }
+  .d-dica .corpo { font-size: 42px; margin-top: 34px; max-width: 900px; }
+  .d-dica .destaque { margin-top: 48px; display: flex; gap: 22px; align-items: flex-start; padding: 30px 34px; border-radius: 24px; background: var(--branco); color: var(--noite); font-size: 38px; font-weight: 500; line-height: 1.3; }
+  .tema-noite.d-dica .destaque, .tema-royal.d-dica .destaque { background: rgba(255,255,255,.08); color: var(--branco); }
+  .d-dica .destaque .ico { width: 48px; height: 48px; color: var(--royal); margin-top: 2px; }
+  .tema-noite.d-dica .destaque .ico, .tema-royal.d-dica .destaque .ico { color: var(--agua); }
+  .d-dica .espaco { flex: 1; }
+</style>
+<script src="base.js"></script>
+</head><body>
+<script>
+const DEMO = {
+  tema: "gelo",
+  rotulo: "Dica JN",
+  titulo: "Derramou algo no sofá*?*",
+  texto: "Retire o excesso com papel toalha, dando batidinhas de fora para dentro. Nunca esfregue: isso espalha a mancha e empurra a sujeira para a espuma.",
+  icone: "gota",
+  destaque: "Mancha antiga? Mande uma foto no Direct e a gente avalia.",
+};
+JN.montar((s) => `
+<div class="canvas d-dica tema-${s.tema}">
+  <div class="deco">
+    ${JN.formaBlob({ x: 640, y: -160, w: 600, h: 560, cor: "var(--agua)", seed: 9, n: 7, irregular: .16, opacidade: .16 })}
+    ${JN.bolha({ x: 930, y: 330, r: 30, cor: "var(--royal)", traco: 3, opacidade: .35 })}
+    ${JN.bolha({ x: 990, y: 400, r: 10, cheia: true, cor: "var(--agua)" })}
+  </div>
+  <div class="conteudo">
+    <div class="topo">${JN.marca()}</div>
+    <div class="cabeca">
+      ${JN.seloIcone({ icone: s.icone, tam: 200, cor: "var(--royal)", corIcone: "var(--branco)", seed: 8, traco: 3.4 })}
+      <div class="rotulo">${JN.rico(s.rotulo)}</div>
+    </div>
+    <h2 class="titulo" data-fit="80">${JN.rico(s.titulo)}</h2>
+    <p class="corpo">${JN.rico(s.texto)}</p>
+    ${s.destaque ? `<div class="destaque">${JN.ico("chat", 48, "", 3.6)}<span>${JN.rico(s.destaque)}</span></div>` : ""}
+    <div class="espaco"></div>
+    ${JN.rodape(s)}
+  </div>
+</div>`, DEMO);
+</script>
+</body></html>

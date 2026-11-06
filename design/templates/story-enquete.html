@@ -1,0 +1,52 @@
+<!doctype html>
+<!--
+  Template: story-enquete  (1080x1920)
+  Story de pergunta/enquete com área livre para o sticker do Instagram.
+  Conteúdo entre y=250 e y=1670; a área .livre fica vazia para posicionar o sticker no app.
+  Campos: rotulo, pergunta, icone, dica_sticker, texto, instagram, cidades, tema (gelo|noite)
+-->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .s-enq .linha1 { display: flex; align-items: center; justify-content: space-between; margin-top: 56px; }
+  .s-enq .titulo { font-size: 100px; margin-top: 36px; }
+  .s-enq .dica { display: flex; align-items: center; gap: 14px; margin-top: 54px; font-weight: 600; font-size: 30px; letter-spacing: .12em; text-transform: uppercase; color: var(--acento); }
+  .s-enq .dica .ico { width: 40px; height: 40px; }
+  .s-enq .livre { flex: 1; min-height: 360px; }
+  .s-enq .texto { font-size: 40px; max-width: 860px; }
+  .s-enq .rodape { margin-top: 34px; }
+</style>
+<script src="base.js"></script>
+</head><body>
+<script>
+const DEMO = {
+  tema: "gelo",
+  rotulo: "Pergunta rápida",
+  pergunta: "Quando foi a última vez que seu sofá foi *higienizado?*",
+  icone: "sofa",
+  dica_sticker: "Responda na enquete",
+  texto: "Faz tempo? Mande uma foto no *Direct* e receba seu orçamento.",
+};
+JN.montar((s) => `
+<div class="canvas story s-enq tema-${s.tema}">
+  <div class="deco">
+    ${JN.formaBlob({ x: 600, y: -120, w: 700, h: 560, cor: "var(--agua)", seed: 9, n: 7, irregular: .16, opacidade: .18 })}
+    ${JN.formaBlob({ x: -260, y: 1180, w: 820, h: 620, cor: "var(--agua)", seed: 17, n: 7, irregular: .16, opacidade: .14 })}
+    ${JN.bolha({ x: 760, y: 470, r: 22, cor: "var(--royal)", traco: 3, opacidade: .35 })}
+    ${JN.bolha({ x: 724, y: 528, r: 8, cheia: true, cor: "var(--agua)" })}
+  </div>
+  <div class="conteudo">
+    <div class="topo">${JN.marca()}</div>
+    <div class="linha1">
+      <div class="rotulo">${JN.rico(s.rotulo)}</div>
+      ${JN.seloIcone({ icone: s.icone, tam: 190, cor: "var(--royal)", corIcone: "var(--branco)", seed: 12, traco: 3.2 })}
+    </div>
+    <h1 class="titulo" data-fit="80">${JN.rico(s.pergunta)}</h1>
+    <div class="dica">${JN.esc(s.dica_sticker)} <span style="display:inline-flex;transform:rotate(90deg)">${JN.ico("seta", 40, "", 4)}</span></div>
+    <div class="livre" data-livre></div>
+    <p class="corpo texto">${JN.rico(s.texto)}</p>
+    ${JN.rodape(s)}
+  </div>
+</div>`, DEMO);
+</script>
+</body></html>

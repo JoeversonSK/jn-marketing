@@ -1,0 +1,56 @@
+<!doctype html>
+<!--
+  Template: story-oferta  (1080x1920)
+  Story de campanha/oferta. Conteúdo só entre y=250 e y=1670 (zonas da interface do Instagram livres).
+  Campos: rotulo, titulo, subtitulo, selo, oferta{valor,para}, itens[{icone,nome}], cta, cta_sub, instagram, cidades, tema (noite|royal)
+-->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .s-oferta .display { font-size: 200px; margin-top: 14px; }
+  .s-oferta .sub { margin-top: 30px; font-size: 44px; max-width: 900px; }
+  .s-oferta .bloco { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 80px; padding: 96px 0 10px; }
+  .s-oferta .oferta .quem { font-size: 44px; margin-top: 30px; }
+  .s-oferta .rodape { margin-top: 34px; }
+</style>
+<script src="base.js"></script>
+</head><body>
+<script>
+const DEMO = {
+  tema: "noite",
+  selo: "Inauguração",
+  rotulo: "Agora no Cariri",
+  titulo: "Chegamos*.*",
+  subtitulo: "Higienização de estofados na sua casa,\nem *Juazeiro do Norte* e *Barbalha*.",
+  oferta: { valor: "20", para: "para os *10 primeiros* clientes" },
+  itens: JN.ITENS_PADRAO,
+  cta: "Mande uma foto no Direct",
+  cta_sub: "e receba seu orçamento",
+};
+JN.montar((s) => `
+<div class="canvas story s-oferta tema-${s.tema}">
+  <div class="deco">
+    ${JN.formaBlob({ x: 700, y: -160, w: 560, h: 520, cor: "var(--noite-2)", seed: 4, n: 6, irregular: .18 })}
+    ${JN.formaBlob({ x: 660, y: 1730, w: 620, h: 420, cor: "var(--noite-2)", seed: 21, n: 6, irregular: .2 })}
+    ${JN.bolha({ x: 944, y: 392, r: 44, cor: "var(--agua)", traco: 3, opacidade: .6 })}
+    ${JN.bolha({ x: 870, y: 430, r: 13, cor: "var(--agua)", traco: 3, opacidade: .6 })}
+    ${JN.bolha({ x: 1004, y: 458, r: 8, cheia: true, cor: "var(--agua)" })}
+    ${JN.bolha({ x: 940, y: 900, r: 52, cor: "var(--agua)", traco: 3, opacidade: .45 })}
+    ${JN.bolha({ x: 1004, y: 976, r: 11, cheia: true, cor: "var(--agua)", opacidade: .9 })}
+  </div>
+  <div class="conteudo">
+    <div class="topo">${JN.marca()}${s.selo ? `<span class="pilula">${JN.esc(s.selo)}</span>` : ""}</div>
+    <div style="height:56px"></div>
+    <div class="rotulo">${JN.rico(s.rotulo)}</div>
+    <h1 class="display" data-fit="140">${JN.rico(s.titulo)}</h1>
+    <p class="corpo sub">${JN.rico(s.subtitulo)}</p>
+    <div class="bloco">
+      ${JN.oferta(s.oferta, 270, { x: -300, y: -56, r: 220, b: -70 })}
+      ${JN.chips(s.itens)}
+    </div>
+    ${JN.cta(s.cta, s.cta_sub)}
+    ${JN.rodape(s)}
+  </div>
+</div>`, DEMO);
+</script>
+</body></html>

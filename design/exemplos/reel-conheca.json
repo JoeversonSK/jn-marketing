@@ -1,0 +1,13 @@
+{
+  "saida": "03-reel-conheca.mp4",
+  "fps": 30,
+  "transicao": {"tipo": "wipeup", "duracao": 0.5},
+  "capa": {"template": "reel-cena", "dados": {"cena": "capa"}, "arquivo": "03-reel-conheca-capa.jpg"},
+  "cenas": [
+    {"template": "reel-cena", "duracao": 3.4, "dados": {"cena": "gancho"}},
+    {"template": "reel-cena", "duracao": 3.9, "dados": {"cena": "problema"}, "transicao": "slideleft"},
+    {"template": "reel-cena", "duracao": 3.6, "dados": {"cena": "solucao"}, "transicao": "wipeup"},
+    {"template": "reel-cena", "duracao": 3.2, "dados": {"cena": "oferta"}, "transicao": "circleopen"},
+    {"template": "reel-cena", "duracao": 3.9, "dados": {"cena": "cta"}, "transicao": "slideup"}
+  ]
+}

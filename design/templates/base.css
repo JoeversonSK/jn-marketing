@@ -1,0 +1,160 @@
+/* =========================================================
+   JN Higienização — base visual compartilhada por todos os templates
+   Tokens documentados em design/GUIA.md
+   ========================================================= */
+
+@font-face { font-family: "Poppins"; font-weight: 400; src: url("../fonts/Poppins-Regular.ttf"); }
+@font-face { font-family: "Poppins"; font-weight: 500; src: url("../fonts/Poppins-Medium.ttf"); }
+@font-face { font-family: "Poppins"; font-weight: 700; src: url("../fonts/Poppins-Bold.ttf"); }
+@font-face { font-family: "Inter"; font-weight: 400; src: url("../fonts/Inter-Regular.otf"); }
+@font-face { font-family: "Inter"; font-weight: 500; src: url("../fonts/Inter-Medium.otf"); }
+@font-face { font-family: "Inter"; font-weight: 600; src: url("../fonts/Inter-SemiBold.otf"); }
+@font-face { font-family: "Inter"; font-weight: 700; src: url("../fonts/Inter-Bold.otf"); }
+
+:root {
+  /* paleta */
+  --royal: #1C3AC4;
+  --royal-claro: #2C4FDB;
+  --noite: #0B1650;
+  --noite-2: #12207A;
+  --agua: #5EC8F2;
+  --agua-clara: #78C8FF;
+  --branco: #FFFFFF;
+  --gelo: #EEF3FF;
+  --limao: #D6F84C;
+
+  /* grid */
+  --m: 80px;          /* margem lateral */
+  --topo: 80px;       /* margem superior (feed) */
+  --base: 80px;       /* margem inferior (feed) */
+  --gap: 24px;        /* gutter */
+
+  /* tipografia */
+  --f-display: "Poppins", sans-serif;
+  --f-texto: "Inter", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; }
+body { -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; font-kerning: normal; }
+
+/* ---------- canvas ---------- */
+.canvas {
+  position: relative; overflow: hidden;
+  width: 1080px; height: 1350px;
+  font-family: var(--f-texto); color: var(--branco);
+  font-feature-settings: "ss01" 0, "cv11" 1;
+}
+.canvas.story { height: 1920px; --topo: 250px; --base: 250px; }
+
+.tema-noite { background: var(--noite); color: var(--branco); --tx: var(--branco); --tx-2: rgba(255,255,255,.78); --acento: var(--agua); --linha: rgba(255,255,255,.18); }
+.tema-royal { background: var(--royal); color: var(--branco); --tx: var(--branco); --tx-2: rgba(255,255,255,.84); --acento: var(--agua-clara); --linha: rgba(255,255,255,.24); }
+.tema-gelo  { background: var(--gelo);  color: var(--noite);  --tx: var(--noite);  --tx-2: rgba(11,22,80,.74);  --acento: var(--royal); --linha: rgba(11,22,80,.14); }
+
+/* camada decorativa (blobs, bolhas) sempre atrás do conteúdo */
+.deco { position: absolute; inset: 0; pointer-events: none; }
+.deco svg { position: absolute; overflow: visible; }
+.conteudo > * { position: relative; z-index: 1; }
+.conteudo > .meio, .conteudo > .bloco { z-index: 0; }
+.conteudo { position: absolute; inset: var(--topo) var(--m) var(--base) var(--m); display: flex; flex-direction: column; }
+
+/* ---------- tipografia ---------- */
+.display { font-family: var(--f-display); font-weight: 700; line-height: .9; letter-spacing: -0.035em; color: var(--tx); }
+.titulo  { font-family: var(--f-display); font-weight: 700; line-height: 1.02; letter-spacing: -0.025em; color: var(--tx); }
+.corpo   { font-family: var(--f-texto); font-weight: 400; font-size: 40px; line-height: 1.34; color: var(--tx-2); letter-spacing: -0.005em; }
+.corpo strong { font-weight: 600; color: var(--tx); }
+.rotulo  { font-family: var(--f-texto); font-weight: 600; font-size: 30px; letter-spacing: .14em; text-transform: uppercase; color: var(--acento); }
+.acento  { color: var(--acento); }
+.limao   { color: var(--limao); }
+.ponto   { color: var(--agua); }
+
+/* ---------- assinatura da marca ---------- */
+.marca { display: flex; align-items: center; gap: 18px; }
+.marca img { width: 68px; height: 68px; display: block; }
+.marca span { font-family: var(--f-display); font-weight: 700; font-size: 30px; letter-spacing: -0.01em; color: var(--tx); line-height: 1; }
+.marca span em { font-style: normal; font-weight: 500; opacity: .72; }
+
+.topo { display: flex; align-items: center; justify-content: space-between; }
+
+.pilula {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--f-texto); font-weight: 600; font-size: 28px; letter-spacing: .12em; text-transform: uppercase;
+  padding: 14px 26px; border-radius: 999px; border: 2px solid var(--acento); color: var(--acento); line-height: 1;
+}
+.pilula.cheia { background: var(--limao); border-color: var(--limao); color: var(--noite); }
+
+.rodape {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--f-texto); font-weight: 600; font-size: 30px; color: var(--tx-2);
+  padding-top: 26px; border-top: 2px solid var(--linha);
+}
+.rodape .handle { color: var(--tx); }
+
+/* ---------- CTA ---------- */
+.cta {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  background: var(--limao); color: var(--noite);
+  border-radius: 28px; padding: 34px 40px;
+  font-family: var(--f-texto); font-weight: 700; font-size: 40px; line-height: 1.15; letter-spacing: -0.01em;
+}
+.cta .seta { flex: none; width: 76px; height: 76px; border-radius: 50%; background: var(--noite); color: var(--limao); display: grid; place-items: center; }
+.cta.branco { background: var(--branco); }
+.cta.branco .seta { background: var(--royal); color: var(--branco); }
+.cta small { display: block; font-weight: 500; font-size: 32px; opacity: .78; margin-top: 6px; letter-spacing: 0; }
+
+/* ---------- ícones ---------- */
+.ico { display: inline-block; flex: none; }
+.ico svg { display: block; width: 100%; height: 100%; }
+.selo-ico { flex: none; display: grid; place-items: center; border-radius: 50%; }
+
+/* lista de itens atendidos */
+.itens { display: flex; flex-direction: column; gap: 20px; }
+.itens li { list-style: none; display: flex; align-items: center; gap: 20px; font-size: 38px; font-weight: 500; color: var(--tx); line-height: 1; }
+.itens .ico { width: 56px; height: 56px; color: var(--acento); }
+.itens .ico svg { stroke-width: 3.6; }
+
+/* bloco de oferta */
+.oferta { display: flex; flex-direction: column; position: relative; z-index: 0; }
+.fundo-oferta { position: absolute; z-index: -1; pointer-events: none; }
+.fundo-oferta svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.oferta .valor { display: flex; align-items: flex-start; font-family: var(--f-display); font-weight: 700; color: var(--limao); letter-spacing: -0.05em; line-height: .8; }
+.oferta .valor .pct { font-size: .5em; letter-spacing: -0.02em; margin-left: .04em; margin-top: .06em; }
+.oferta .valor .off { display: flex; flex-direction: column; font-size: .3em; letter-spacing: 0; line-height: .92; margin-left: .14em; margin-top: .1em; }
+.oferta .quem { font-family: var(--f-texto); font-weight: 500; font-size: 40px; line-height: 1.25; color: var(--tx); margin-top: 26px; }
+
+/* ---------- animação (usada pelo reel.py) ---------- */
+.animar .a { animation-duration: .7s; animation-fill-mode: both; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+.animar .a-sobe   { animation-name: sobe; }
+.animar .a-surge  { animation-name: surge; }
+.animar .a-escala { animation-name: escala; animation-timing-function: cubic-bezier(.2,1.3,.4,1); }
+.animar .a-mascara{ animation-name: mascara; animation-duration: .8s; }
+.animar .a-esq    { animation-name: esq; }
+.animar .zoom     { animation: zoom var(--dur, 4s) linear both; transform-origin: 60% 50%; }
+.animar .flutua   { animation: flutua var(--dur, 4s) ease-in-out both; }
+@keyframes sobe   { from { opacity: 0; transform: translateY(70px); } to { opacity: 1; transform: none; } }
+@keyframes surge  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes escala { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes mascara{ from { clip-path: inset(0 0 100% 0); transform: translateY(40px); } to { clip-path: inset(0 0 -20% 0); transform: none; } }
+@keyframes esq    { from { opacity: 0; transform: translateX(-60px); } to { opacity: 1; transform: none; } }
+@keyframes zoom   { from { transform: scale(1); } to { transform: scale(1.08); } }
+@keyframes flutua { from { transform: translateY(30px); } to { transform: translateY(-30px); } }
+
+/* chips de itens (horizontal, quebra linha) */
+.chips { display: flex; flex-wrap: wrap; gap: 16px; }
+.chips span.chip { display: inline-flex; align-items: center; gap: 14px; padding: 16px 28px 16px 20px; border-radius: 999px; border: 2px solid var(--linha); font-size: 38px; font-weight: 500; color: var(--tx); line-height: 1; }
+.chips .ico { width: 50px; height: 50px; color: var(--acento); }
+.chips .ico svg { stroke-width: 3.6; }
+
+/* selo de ícone em blob */
+.selo-blob { position: relative; display: grid; place-items: center; flex: none; }
+.selo-blob .sb-fundo { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.selo-blob .ico { position: relative; }
+
+/* progresso do carrossel */
+.progresso { display: flex; gap: 10px; }
+.progresso i { display: block; width: 44px; height: 8px; border-radius: 8px; background: var(--linha); }
+.progresso i.ja { background: var(--tx-2); opacity: .5; }
+.progresso i.on { width: 88px; background: var(--acento); }
+
+.arraste { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; font-size: 30px; color: var(--tx); }
+.arraste .ico { width: 40px; height: 40px; color: var(--acento); }

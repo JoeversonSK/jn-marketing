@@ -1,0 +1,63 @@
+<!doctype html>
+<!--
+  Template: story-agenda  (1080x1920)
+  Story de agenda/vagas do dia. Conteúdo entre y=250 e y=1670.
+  Campos: dia (pílula), rotulo (data), titulo, horario_rotulo, horario, aviso (pílula limão), linha_oferta, cta, cta_sub, instagram, cidades, tema (royal|noite)
+-->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .s-agenda .rotulo { margin-top: 56px; }
+  .s-agenda .display { font-size: 176px; margin-top: 18px; line-height: .88; }
+  .s-agenda .hora { display: flex; align-items: center; gap: 40px; margin-top: 56px; }
+  .s-agenda .hora .txt small { display: block; font-family: var(--f-texto); font-weight: 500; font-size: 44px; color: var(--tx-2); }
+  .s-agenda .hora .txt b { display: block; font-family: var(--f-display); font-weight: 700; font-size: 200px; line-height: .9; letter-spacing: -0.04em; }
+  .s-agenda .avisos { display: flex; flex-direction: column; align-items: flex-start; gap: 26px; margin-top: 48px; }
+  .s-agenda .avisos .pilula { font-size: 32px; padding: 18px 30px; }
+  .s-agenda .avisos .corpo { font-size: 40px; color: var(--tx); font-weight: 500; }
+  .s-agenda .espaco { flex: 1; }
+  .s-agenda .rodape { margin-top: 34px; }
+</style>
+<script src="base.js"></script>
+</head><body>
+<script>
+const DEMO = {
+  tema: "royal",
+  dia: "Inauguração",
+  rotulo: "Sábado, 7 de novembro",
+  titulo: "Agenda\naberta\n*hoje.*",
+  horario_rotulo: "a partir das",
+  horario: "12h",
+  aviso: "Vagas limitadas",
+  linha_oferta: "_20% OFF_ para os 10 primeiros clientes",
+  cta: "Garanta seu horário",
+  cta_sub: "Mande uma foto no Direct ou WhatsApp",
+};
+JN.montar((s) => `
+<div class="canvas story s-agenda tema-${s.tema}">
+  <div class="deco">
+    ${JN.formaBlob({ x: 660, y: 300, w: 640, h: 700, cor: "var(--noite)", seed: 14, n: 7, irregular: .15, opacidade: .18 })}
+    ${JN.formaBlob({ x: -220, y: 1700, w: 760, h: 520, cor: "var(--noite)", seed: 6, n: 6, irregular: .18, opacidade: .22 })}
+    ${JN.bolha({ x: 900, y: 560, r: 60, cor: "var(--agua-clara)", traco: 3, opacidade: .6 })}
+    ${JN.bolha({ x: 806, y: 660, r: 16, cor: "var(--agua-clara)", traco: 3, opacidade: .6 })}
+    ${JN.bolha({ x: 990, y: 680, r: 10, cheia: true, cor: "var(--agua-clara)" })}
+  </div>
+  <div class="conteudo">
+    <div class="topo">${JN.marca()}${s.dia ? `<span class="pilula">${JN.esc(s.dia)}</span>` : ""}</div>
+    <div class="rotulo">${JN.rico(s.rotulo)}</div>
+    <h1 class="display">${JN.rico(s.titulo)}</h1>
+    <div class="hora">
+      ${JN.seloIcone({ icone: "relogio", tam: 210, cor: "var(--noite)", corIcone: "var(--agua-clara)", seed: 2, traco: 3.4 })}
+      <div class="txt"><small>${JN.rico(s.horario_rotulo)}</small><b>${JN.rico(s.horario)}</b></div>
+    </div>
+    <div class="avisos">
+      ${s.aviso ? `<span class="pilula cheia">${JN.esc(s.aviso)}</span>` : ""}
+      ${s.linha_oferta ? `<p class="corpo">${JN.rico(s.linha_oferta)}</p>` : ""}
+    </div>
+    <div class="espaco"></div>
+    ${JN.cta(s.cta, s.cta_sub, "branco")}
+    ${JN.rodape(s)}
+  </div>
+</div>`, DEMO);
+</script>
+</body></html>

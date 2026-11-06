@@ -1,0 +1,55 @@
+<!doctype html>
+<!--
+  Template: carrossel-item  (1080x1350)
+  Miolo numerado de carrossel educativo (um tópico por card).
+  Campos: numero (1..n), total_itens (para a barra), rotulo ("Sinal"), titulo, texto, icone, seed (forma do selo), instagram, tema (gelo|noite)
+-->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .c-item .linha1 { display: flex; align-items: flex-start; justify-content: space-between; margin-top: 70px; }
+  .c-item .num { font-family: var(--f-display); font-weight: 700; font-size: 300px; line-height: .78; letter-spacing: -0.05em; color: var(--royal); margin-right: -10px; }
+  .c-item .rotulo { margin-top: 64px; }
+  .c-item .titulo { font-size: 100px; margin-top: 18px; }
+  .c-item .corpo { font-size: 42px; margin-top: 34px; max-width: 900px; }
+  .c-item .contador { font-weight: 600; font-size: 30px; letter-spacing: .08em; color: var(--tx-2); }
+  .c-item .espaco { flex: 1; }
+  .c-item .pe { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
+</style>
+<script src="base.js"></script>
+</head><body>
+<script>
+const DEMO = {
+  tema: "gelo",
+  numero: 1,
+  total_itens: 5,
+  rotulo: "Sinal",
+  titulo: "Manchas que não saem",
+  texto: "Café, suor e gordura penetram nas fibras. Pano úmido e produto caseiro só espalham a sujeira.",
+  icone: "mancha",
+  seed: 3,
+};
+const pad = (n) => String(n).padStart(2, "0");
+JN.montar((s) => `
+<div class="canvas c-item tema-${s.tema}">
+  <div class="deco">
+    ${JN.formaBlob({ x: 680, y: 1080, w: 620, h: 520, cor: "var(--agua)", seed: 30 + s.numero, n: 7, irregular: .16, opacidade: .14 })}
+    ${JN.bolha({ x: 470, y: 250, r: 24, cor: "var(--royal)", traco: 3, opacidade: .35 })}
+    ${JN.bolha({ x: 512, y: 312, r: 9, cheia: true, cor: "var(--agua)" })}
+  </div>
+  <div class="conteudo">
+    <div class="topo">${JN.marca()}<span class="contador">${pad(s.numero)} / ${pad(s.total_itens)}</span></div>
+    <div class="linha1">
+      ${JN.seloIcone({ icone: s.icone, tam: 300, cor: "var(--royal)", corIcone: "var(--branco)", seed: s.seed || s.numero, traco: 3 })}
+      <div class="num">${pad(s.numero)}</div>
+    </div>
+    <div class="rotulo">${JN.esc(s.rotulo)} ${pad(s.numero)}</div>
+    <h2 class="titulo" data-fit="80">${JN.rico(s.titulo)}</h2>
+    <p class="corpo">${JN.rico(s.texto)}</p>
+    <div class="espaco"></div>
+    <div class="pe">${JN.progresso(s.numero, s.total_itens)}<span class="arraste">Arraste ${JN.ico("seta", 40, "", 4)}</span></div>
+    ${JN.rodape(s)}
+  </div>
+</div>`, DEMO);
+</script>
+</body></html>

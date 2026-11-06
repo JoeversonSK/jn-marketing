@@ -1,0 +1,4 @@
+Poppins (Indian Type Foundry) e Inter (Rasmus Andersson) são distribuídas sob a
+SIL Open Font License 1.1 (https://openfontlicense.org). Cópias locais feitas a partir
+de /usr/share/fonts para uso offline pelos templates. Permitido usar, embutir e redistribuir;
+não é permitido vender as fontes isoladamente.

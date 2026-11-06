@@ -1,0 +1,48 @@
+<!doctype html>
+<!--
+  Template: carrossel-cta  (1080x1350)
+  Fechamento de carrossel: pergunta + oferta + chamada para ação.
+  Campos: rotulo, titulo, texto, oferta{valor,para} (opcional), cta, cta_sub, instagram, cidades, tema (noite|royal)
+-->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .c-cta .rotulo { margin-top: 90px; }
+  .c-cta .titulo { font-size: 120px; margin-top: 18px; }
+  .c-cta .corpo { font-size: 42px; margin-top: 30px; max-width: 880px; }
+  .c-cta .meio { flex: 1; display: flex; align-items: center; padding: 30px 0; }
+  .c-cta .oferta { flex-direction: row; align-items: center; gap: 40px; }
+  .c-cta .oferta .quem { margin-top: 0; max-width: 360px; }
+  .c-cta .rodape { margin-top: 34px; }
+</style>
+<script src="base.js"></script>
+</head><body>
+<script>
+const DEMO = {
+  tema: "noite",
+  rotulo: "E aí?",
+  titulo: "Marcou algum sinal*?*",
+  texto: "A higienização profunda tira a sujeira que a limpeza do dia a dia não alcança.",
+  oferta: { valor: "20", para: "para os *10~primeiros* clientes" },
+  cta: "Peça seu orçamento por foto",
+  cta_sub: "no Direct ou WhatsApp",
+};
+JN.montar((s) => `
+<div class="canvas c-cta tema-${s.tema}">
+  <div class="deco">
+    ${JN.formaBlob({ x: 720, y: -200, w: 560, h: 520, cor: "var(--noite-2)", seed: 4, n: 6, irregular: .18 })}
+    ${JN.bolha({ x: 950, y: 236, r: 34, cor: "var(--agua)", traco: 3, opacidade: .6 })}
+    ${JN.bolha({ x: 1006, y: 290, r: 10, cheia: true, cor: "var(--agua)" })}
+  </div>
+  <div class="conteudo">
+    <div class="topo">${JN.marca()}<span class="pilula">Inauguração</span></div>
+    <div class="rotulo">${JN.rico(s.rotulo)}</div>
+    <h2 class="titulo" data-fit="80">${JN.rico(s.titulo)}</h2>
+    <p class="corpo">${JN.rico(s.texto)}</p>
+    <div class="meio">${s.oferta ? JN.oferta(s.oferta, 220, { x: -240, y: -60, r: 120, b: -60 }) : ""}</div>
+    ${JN.cta(s.cta, s.cta_sub)}
+    ${JN.rodape(s)}
+  </div>
+</div>`, DEMO);
+</script>
+</body></html>
