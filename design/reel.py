@@ -158,8 +158,8 @@ def main(argv=None):
 
     total = duracao_video(saida)
     print(f"reel: {saida}  ({total:.2f}s, {LARGURA}x{ALTURA}, {fps}fps, com música sincronizada)")
-    if not 12 <= total <= 20:
-        print(f"  ! duração fora da faixa recomendada (12–20 s): {total:.2f}s")
+    if not 12 <= total <= 40:
+        print(f"  ! duração fora da faixa recomendada (12–40 s): {total:.2f}s")
 
 
 if __name__ == "__main__":

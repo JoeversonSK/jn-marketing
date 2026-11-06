@@ -169,3 +169,14 @@ Para um vídeo que não saiu do reel.py (ex.: vídeo real do serviço):
 python3 design/musica.py --video video.mp4 --saida final.mp4 --estilo animado --seed N
 ```
 Os cortes são detectados automaticamente. Com o roteiro, use `--roteiro roteiro.json` para tempo exato.
+
+
+## Tempo de leitura nos Reels
+
+O vídeo precisa dar tempo de ler com calma no celular. Regra para a duração de cada cena:
+
+**duração = última entrada de texto + (palavras ÷ 2,3) + 1,2 s de pausa**, arredondado para cima.
+
+- Cena com 5–8 palavras: ~5,5 s. Com 25–30 palavras: ~8–9 s (ou divida em duas cenas).
+- Transições de 0,7 s, suaves (wipe, slide, circleopen).
+- Reel total entre 20 e 35 s. Nunca acelere o texto para caber num tempo menor: corte texto ou crie outra cena.

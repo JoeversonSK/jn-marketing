@@ -3,7 +3,7 @@
   "fps": 30,
   "transicao": {
     "tipo": "wipeup",
-    "duracao": 0.5
+    "duracao": 0.7
   },
   "capa": {
     "template": "reel-cena",
@@ -15,42 +15,54 @@
   "cenas": [
     {
       "template": "reel-cena",
-      "duracao": 3.4,
+      "duracao": 5.5,
       "dados": {
         "cena": "gancho"
       }
     },
     {
       "template": "reel-cena",
-      "duracao": 3.9,
+      "duracao": 9.0,
       "dados": {
         "cena": "problema"
       },
-      "transicao": "slideleft"
+      "transicao": {
+        "tipo": "slideleft",
+        "duracao": 0.7
+      }
     },
     {
       "template": "reel-cena",
-      "duracao": 3.6,
+      "duracao": 6.5,
       "dados": {
         "cena": "solucao"
       },
-      "transicao": "wipeup"
+      "transicao": {
+        "tipo": "wipeup",
+        "duracao": 0.7
+      }
     },
     {
       "template": "reel-cena",
-      "duracao": 3.2,
+      "duracao": 6.0,
       "dados": {
         "cena": "oferta"
       },
-      "transicao": "circleopen"
+      "transicao": {
+        "tipo": "circleopen",
+        "duracao": 0.7
+      }
     },
     {
       "template": "reel-cena",
-      "duracao": 3.9,
+      "duracao": 8.0,
       "dados": {
         "cena": "cta"
       },
-      "transicao": "slideup"
+      "transicao": {
+        "tipo": "slideup",
+        "duracao": 0.7
+      }
     }
   ],
   "musica": {
