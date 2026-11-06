@@ -31,7 +31,13 @@ def main():
     print(f"Servidor escolhido: {host_para(token)}")
     for host in ("graph.instagram.com", "graph.facebook.com"):
         print(f"\n[{host}]")
-        print("  me:", tentar(host, "me", token, fields="id,user_id,username,name"))
+        if host == "graph.facebook.com":
+            print("  me:", tentar(host, "me", token, fields="id,name"))
+            print("  permissoes:", tentar(host, "me/permissions", token))
+            print("  contas IG ligadas:", tentar(host, "me", token,
+                  fields="instagram_accounts{id,username},businesses{id,name}"))
+        else:
+            print("  me:", tentar(host, "me", token, fields="user_id,username"))
         if host == "graph.facebook.com":
             print("  me/accounts:", tentar(host, "me/accounts", token,
                                            fields="name,instagram_business_account{id,username}"))
