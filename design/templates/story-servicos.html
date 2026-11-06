@@ -1,0 +1,62 @@
+<!doctype html>
+<!--
+  Template: story-servicos  (1080x1920)
+  Story fixo (para destaque) com a grade de serviços. Conteúdo entre y=250 e y=1670.
+  Campos: selo, rotulo, titulo, itens[{icone,nome}] (5), extra{icone,nome} (6º bloco em destaque),
+          local, cta, cta_sub, instagram, cidades, tema (noite|royal)
+-->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .s-serv .rotulo { margin-top: 56px; }
+  .s-serv .titulo { font-size: 124px; margin-top: 16px; line-height: .96; }
+  .s-serv .grade { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 52px; }
+  .s-serv .bloco { height: 152px; border-radius: 28px; background: rgba(255,255,255,.07); display: flex; align-items: center; gap: 22px; padding: 0 30px; }
+  .s-serv .bloco .ico { width: 76px; height: 76px; color: var(--agua); }
+  .s-serv .bloco .ico svg { stroke-width: 3.4; }
+  .s-serv .bloco span.n { font-family: var(--f-display); font-weight: 700; font-size: 46px; letter-spacing: -0.02em; color: var(--tx); line-height: 1.05; }
+  .s-serv .bloco.destaque { background: var(--royal); }
+  .s-serv .bloco.destaque .ico { color: var(--branco); }
+  .s-serv .local { display: flex; align-items: center; gap: 18px; margin-top: 40px; font-size: 40px; font-weight: 500; color: var(--tx); }
+  .s-serv .local .ico { width: 54px; height: 54px; color: var(--agua); }
+  .s-serv .espaco { flex: 1; }
+  .s-serv .rodape { margin-top: 34px; }
+</style>
+<script src="base.js"></script>
+</head><body>
+<script>
+const DEMO = {
+  tema: "noite",
+  selo: "Serviços",
+  rotulo: "O que a gente higieniza",
+  titulo: "Tudo isso, na *sua casa.*",
+  itens: JN.ITENS_PADRAO,
+  extra: { icone: "casa", nome: "Atendimento\nno local" },
+  local: "Juazeiro do Norte e Barbalha",
+  cta: "Chame no WhatsApp",
+  cta_sub: "(88) 92100-8263 · link na bio",
+};
+JN.montar((s) => `
+<div class="canvas story s-serv tema-${s.tema}">
+  <div class="deco">
+    ${JN.formaBlob({ x: 640, y: -160, w: 620, h: 560, cor: "var(--noite-2)", seed: 4, n: 6, irregular: .18 })}
+    ${JN.formaBlob({ x: -240, y: 1700, w: 760, h: 520, cor: "var(--noite-2)", seed: 21, n: 6, irregular: .2 })}
+    ${JN.bolha({ x: 930, y: 160, r: 40, cor: "var(--agua)", traco: 3, opacidade: .55 })}
+    ${JN.bolha({ x: 990, y: 214, r: 9, cheia: true, cor: "var(--agua)" })}
+  </div>
+  <div class="conteudo">
+    <div class="topo">${JN.marca()}${s.selo ? `<span class="pilula">${JN.esc(s.selo)}</span>` : ""}</div>
+    <div class="rotulo">${JN.rico(s.rotulo)}</div>
+    <h1 class="titulo" data-fit="90">${JN.rico(s.titulo)}</h1>
+    <div class="grade">
+      ${s.itens.map((it) => `<div class="bloco">${JN.ico(it.icone, 76)}<span class="n">${JN.esc(it.nome)}</span></div>`).join("")}
+      ${s.extra ? `<div class="bloco destaque">${JN.ico(s.extra.icone, 76)}<span class="n">${JN.rico(s.extra.nome)}</span></div>` : ""}
+    </div>
+    <div class="local">${JN.ico("local", 54, "", 3.4)}<span>${JN.rico(s.local)}</span></div>
+    <div class="espaco"></div>
+    ${JN.cta(s.cta, s.cta_sub)}
+    ${JN.rodape(s)}
+  </div>
+</div>`, DEMO);
+</script>
+</body></html>

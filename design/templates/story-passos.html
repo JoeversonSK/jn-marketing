@@ -1,0 +1,61 @@
+<!doctype html>
+<!--
+  Template: story-passos  (1080x1920)
+  "Como funciona" em passos numerados ligados por uma linha. Conteúdo entre y=250 e y=1670.
+  Campos: selo, rotulo, titulo, passos[{icone,titulo,texto}] (3), cta, cta_sub, instagram, cidades, tema (gelo|noite)
+-->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .s-passos .rotulo { margin-top: 56px; }
+  .s-passos .titulo { font-size: 124px; margin-top: 16px; line-height: .96; }
+  .s-passos .lista { position: relative; margin-top: 56px; display: flex; flex-direction: column; gap: 40px; }
+  .s-passos .lista::before { content: ""; position: absolute; left: 66px; top: 70px; bottom: 70px; width: 4px; border-radius: 4px; background: var(--linha); }
+  .s-passos .passo { position: relative; display: flex; gap: 40px; align-items: flex-start; }
+  .s-passos .num { flex: none; width: 136px; height: 136px; border-radius: 50%; background: var(--royal); color: var(--branco); display: grid; place-items: center; position: relative; }
+  .s-passos .num .ico { width: 68px; height: 68px; }
+  .s-passos .num b { position: absolute; top: -6px; right: -10px; width: 52px; height: 52px; border-radius: 50%; background: var(--agua); color: var(--noite); font-family: var(--f-display); font-weight: 700; font-size: 28px; display: grid; place-items: center; box-shadow: 0 0 0 6px var(--gelo); }
+  .tema-noite.s-passos .num b { box-shadow: 0 0 0 6px var(--noite); }
+  .s-passos .passo h3 { font-family: var(--f-display); font-weight: 700; font-size: 54px; line-height: 1.08; letter-spacing: -0.02em; color: var(--tx); margin-top: 8px; }
+  .s-passos .passo p { font-size: 38px; line-height: 1.3; color: var(--tx-2); margin-top: 12px; }
+  .s-passos .espaco { flex: 1; }
+  .s-passos .rodape { margin-top: 34px; }
+</style>
+<script src="base.js"></script>
+</head><body>
+<script>
+const DEMO = {
+  tema: "gelo",
+  selo: "Como funciona",
+  rotulo: "Como funciona",
+  titulo: "Simples *assim.*",
+  passos: [
+    { icone: "chat", titulo: "Chame no WhatsApp", texto: "Conte o que precisa higienizar." },
+    { icone: "calendario", titulo: "A gente combina o melhor dia e horário", texto: "Sábados a partir das 12h, domingos e feriados." },
+    { icone: "brilho", titulo: "Higienização profunda na sua casa", texto: "Em Juazeiro do Norte e Barbalha." },
+  ],
+  cta: "Chame no WhatsApp",
+  cta_sub: "(88) 92100-8263 · link na bio",
+};
+JN.montar((s) => `
+<div class="canvas story s-passos tema-${s.tema}">
+  <div class="deco">
+    ${JN.formaBlob({ x: 620, y: -140, w: 680, h: 560, cor: "var(--agua)", seed: 9, n: 7, irregular: .16, opacidade: .18 })}
+    ${JN.formaBlob({ x: -280, y: 1660, w: 820, h: 560, cor: "var(--agua)", seed: 17, n: 7, irregular: .16, opacidade: .14 })}
+    ${JN.bolha({ x: 930, y: 310, r: 40, cor: "var(--royal)", traco: 3, opacidade: .35 })}
+    ${JN.bolha({ x: 990, y: 370, r: 9, cheia: true, cor: "var(--agua)" })}
+  </div>
+  <div class="conteudo">
+    <div class="topo">${JN.marca()}</div>
+    <div class="rotulo">${JN.rico(s.rotulo)}</div>
+    <h1 class="titulo" data-fit="90">${JN.rico(s.titulo)}</h1>
+    <div class="lista">
+      ${s.passos.map((p, i) => `<div class="passo"><div class="num">${JN.ico(p.icone, 68, "", 3.4)}<b>${i + 1}</b></div><div><h3>${JN.rico(p.titulo)}</h3><p>${JN.rico(p.texto)}</p></div></div>`).join("")}
+    </div>
+    <div class="espaco"></div>
+    ${JN.cta(s.cta, s.cta_sub)}
+    ${JN.rodape(s)}
+  </div>
+</div>`, DEMO);
+</script>
+</body></html>

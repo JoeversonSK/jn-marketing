@@ -1,0 +1,50 @@
+<!doctype html>
+<!--
+  Template: destaque-capa  (1080x1920)
+  Capa de destaque (highlight) do perfil. O Instagram mostra só o círculo central:
+  todo o conteúdo fica dentro de um círculo de 600 px de diâmetro centrado em (540, 960).
+  Sem texto (o nome do destaque aparece embaixo, no app).
+  Campos: icone (promocao | servicos | passos | contato), tema (royal | noite)
+  Ícones bicolores: traço branco + detalhe azul-água, mesma espessura nas quatro capas.
+-->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .capa-dest { display: grid; place-items: center; }
+  .capa-dest .disco { position: absolute; left: 270px; top: 690px; width: 540px; height: 540px; border-radius: 50%; background: rgba(255,255,255,.07); }
+  .tema-noite.capa-dest .disco { background: var(--royal); }
+  .capa-dest .icone { position: absolute; left: 345px; top: 765px; width: 390px; height: 390px; }
+  .capa-dest .icone svg { width: 100%; height: 100%; overflow: visible; }
+  /* guia de recorte (só com ?guia) */
+  .capa-dest .guia { position: absolute; left: 240px; top: 660px; width: 600px; height: 600px; border-radius: 50%; outline: 3px dashed #f0f; }
+</style>
+<script src="base.js"></script>
+</head><body>
+<script>
+const B = 'stroke="#FFFFFF"', A = 'stroke="var(--agua)"';
+const ICONES = {
+  /* etiqueta com % */
+  promocao: `
+    <g ${B}><path d="M34 7h16a7 7 0 0 1 7 7v16a5 5 0 0 1-1.5 3.5L33.5 55.5a5 5 0 0 1-7 0L8.5 37.5a5 5 0 0 1 0-7L30.5 8.5A5 5 0 0 1 34 7z"/><circle cx="46.5" cy="17.5" r="3.6"/></g>
+    <g ${A}><circle cx="24.5" cy="31.5" r="3.4"/><circle cx="36.5" cy="43.5" r="3.4"/><path d="M39 29L22 46"/></g>`,
+  /* sofá + brilho */
+  servicos: `
+    <g ${B}><path d="M13 33v-8a8 8 0 0 1 8-8h22a8 8 0 0 1 8 8v8"/><path d="M32 17.5V33"/><path d="M7 37a5.5 5.5 0 0 1 11 0v4h28v-4a5.5 5.5 0 0 1 11 0v10a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3z"/><path d="M13 50v5M51 50v5"/></g>
+    <g ${A}><path d="M55 1c.8 4.5 2.5 6.2 7 7-4.5.8-6.2 2.5-7 7-.8-4.5-2.5-6.2-7-7 4.5-.8 6.2-2.5 7-7z" stroke-width="2.6"/></g>`,
+  /* passo a passo: lista com o último passo concluído */
+  passos: `
+    <g ${B}><circle cx="14" cy="14" r="6.5"/><path d="M28 14h26"/><circle cx="14" cy="32" r="6.5"/><path d="M28 32h26"/><path d="M28 50h18"/></g>
+    <g ${A}><circle cx="14" cy="50" r="6.5"/><path d="M10.6 50.2l2.4 2.4 4.6-5"/></g>`,
+  /* balão de conversa com reticências (não é o logo de nenhum app) */
+  contato: `
+    <g ${B}><path d="M14 9h36a8 8 0 0 1 8 8v21a8 8 0 0 1-8 8H31l-12 10v-10h-5a8 8 0 0 1-8-8V17a8 8 0 0 1 8-8z"/></g>
+    <g ${A} fill="var(--agua)" stroke-width="0"><circle cx="22" cy="27.5" r="3.6"/><circle cx="32" cy="27.5" r="3.6"/><circle cx="42" cy="27.5" r="3.6"/></g>`,
+};
+JN.montar((s) => `
+<div class="canvas story capa-dest tema-${s.tema}">
+  <div class="disco"></div>
+  <div class="icone"><svg viewBox="0 0 64 64" fill="none" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round">${ICONES[s.icone]}</svg></div>
+  ${s.guia || /guia/.test(location.search) ? '<div class="guia"></div>' : ""}
+</div>`, { tema: "royal", icone: "servicos" });
+</script>
+</body></html>

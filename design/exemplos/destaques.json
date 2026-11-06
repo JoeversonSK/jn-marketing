@@ -1,0 +1,52 @@
+{
+  "saida": "../../../design-out/destaques",
+  "pecas": [
+    {
+      "template": "destaque-capa",
+      "arquivo": "capa-1-inauguracao.jpg",
+      "dados": {
+        "icone": "promocao",
+        "tema": "royal"
+      }
+    },
+    {
+      "template": "destaque-capa",
+      "arquivo": "capa-2-servicos.jpg",
+      "dados": {
+        "icone": "servicos",
+        "tema": "royal"
+      }
+    },
+    {
+      "template": "destaque-capa",
+      "arquivo": "capa-3-como-funciona.jpg",
+      "dados": {
+        "icone": "passos",
+        "tema": "royal"
+      }
+    },
+    {
+      "template": "destaque-capa",
+      "arquivo": "capa-4-contato.jpg",
+      "dados": {
+        "icone": "contato",
+        "tema": "royal"
+      }
+    },
+    {
+      "template": "story-servicos",
+      "arquivo": "story-1-servicos.jpg",
+      "dados": {}
+    },
+    {
+      "template": "story-passos",
+      "arquivo": "story-2-como-funciona.jpg",
+      "dados": {}
+    },
+    {
+      "template": "story-contato",
+      "arquivo": "story-3-contato.jpg",
+      "dados": {}
+    }
+  ]
+}

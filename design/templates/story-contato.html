@@ -1,0 +1,61 @@
+<!doctype html>
+<!--
+  Template: story-contato  (1080x1920)
+  Cartão de contato fixo (para destaque). Número de WhatsApp grande. Conteúdo entre y=250 e y=1670.
+  Campos: rotulo, titulo, canal ("WhatsApp"), numero, numero_sub, linhas[{icone,texto}], instagram, cidades, tema (royal|noite)
+-->
+<html lang="pt-BR"><head><meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .s-cont .rotulo { margin-top: 70px; }
+  .s-cont .titulo { font-size: 136px; margin-top: 16px; line-height: .96; }
+  .s-cont .cartao { margin-top: 70px; background: var(--branco); color: var(--noite); border-radius: 40px; padding: 48px 52px 52px; }
+  .s-cont .cartao .canal { display: flex; align-items: center; gap: 18px; font-weight: 600; font-size: 32px; letter-spacing: .12em; text-transform: uppercase; color: var(--royal); }
+  .s-cont .cartao .canal .ico { width: 52px; height: 52px; }
+  .s-cont .cartao .numero { font-family: var(--f-display); font-weight: 700; font-size: 112px; letter-spacing: -0.035em; line-height: 1; margin-top: 26px; white-space: nowrap; color: var(--noite); }
+  .s-cont .cartao .sub { font-size: 38px; color: rgba(11,22,80,.7); margin-top: 18px; }
+  .s-cont .linhas { margin-top: 80px; display: flex; flex-direction: column; gap: 44px; }
+  .s-cont .linhas div { display: flex; align-items: center; gap: 24px; font-size: 40px; font-weight: 500; color: var(--tx); line-height: 1.25; }
+  .s-cont .linhas .ico { width: 58px; height: 58px; color: var(--agua-clara); }
+  .s-cont .espaco { flex: 1; }
+</style>
+<script src="base.js"></script>
+</head><body>
+<script>
+const DEMO = {
+  tema: "royal",
+  rotulo: "Contato",
+  titulo: "Fale com\n*a gente.*",
+  canal: "WhatsApp",
+  numero: "(88) 92100-8263",
+  numero_sub: "Link direto na bio do perfil",
+  linhas: [
+    { icone: "chat", texto: "Direct: *@jn_.higienizacao*" },
+    { icone: "local", texto: "Juazeiro do Norte e Barbalha, na sua casa" },
+    { icone: "relogio", texto: "Sábados a partir das 12h,\ndomingos e feriados" },
+  ],
+};
+JN.montar((s) => `
+<div class="canvas story s-cont tema-${s.tema}">
+  <div class="deco">
+    ${JN.formaBlob({ x: 640, y: -160, w: 640, h: 580, cor: "var(--noite)", seed: 14, n: 7, irregular: .15, opacidade: .22 })}
+    ${JN.formaBlob({ x: -240, y: 1700, w: 760, h: 520, cor: "var(--noite)", seed: 6, n: 6, irregular: .18, opacidade: .22 })}
+    ${JN.bolha({ x: 930, y: 310, r: 44, cor: "var(--agua-clara)", traco: 3, opacidade: .6 })}
+    ${JN.bolha({ x: 994, y: 374, r: 10, cheia: true, cor: "var(--agua-clara)" })}
+  </div>
+  <div class="conteudo">
+    <div class="topo">${JN.marca()}</div>
+    <div class="rotulo">${JN.rico(s.rotulo)}</div>
+    <h1 class="titulo" data-fit="90">${JN.rico(s.titulo)}</h1>
+    <div class="cartao">
+      <div class="canal">${JN.ico("chat", 52, "", 3.6)}${JN.esc(s.canal)}</div>
+      <div class="numero" data-fit="80">${JN.esc(s.numero)}</div>
+      <div class="sub">${JN.rico(s.numero_sub)}</div>
+    </div>
+    <div class="linhas">${s.linhas.map((l) => `<div>${JN.ico(l.icone, 58, "", 3.4)}<span>${JN.rico(l.texto)}</span></div>`).join("")}</div>
+    <div class="espaco"></div>
+    ${JN.rodape(s)}
+  </div>
+</div>`, DEMO);
+</script>
+</body></html>
