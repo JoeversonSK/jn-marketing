@@ -156,9 +156,9 @@ Marcação nos textos: `*acento*`, `_limão_`, `\n` (quebra de linha), `~` (espa
 A API do Instagram não permite escolher músicas da biblioteca do app. Por isso a trilha vai dentro do MP4.
 Nunca use música comercial ou de terceiros. A trilha é composta por código em `design/musica.py` e é **sincronizada com o vídeo**:
 
-- cada troca de cena cai num tempo forte, com "whoosh" na transição e impacto no corte;
+- a música é contínua (nunca para nas transições); as trocas de cena caem nos tempos, com prato reverso e "whoosh" bem baixos;
 - o acorde muda junto com a cena, e a energia segue o roteiro: gancho leve → problema → solução → oferta (ápice) → chamada final;
-- ticks sutis acompanham a entrada dos textos.
+- a intensidade sobe e desce suavemente com as cenas, sem cortes no som.
 
 O `design/reel.py` já aplica a música sozinho. No JSON do roteiro, use `"musica": {"estilo": "animado", "seed": N}`
 (`animado` para oferta, agenda e lançamento; `suave` para dicas) e mude o `seed` a cada Reel.

@@ -6,12 +6,11 @@ música precisa ir dentro do MP4. Para não usar obra protegida, este script
 COMPÕE e sintetiza uma trilha própria (pop/house leve, clima "limpo e fresco").
 
 Sincronia com o vídeo (o que aparece na tela manda na música):
-- cada troca de cena cai num TEMPO FORTE: a grade de compassos recomeça na cena;
-- "whoosh" crescente durante a transição e IMPACTO (boom + prato) no corte;
-- o acorde muda junto com a cena;
-- a energia segue o roteiro: gancho (leve, sem bumbo) → problema (meia batida) →
-  solução (batida completa) → oferta (o ápice) → chamada final (hit e fade).
-- "ticks" sutis acompanham a entrada dos textos dentro de cada cena.
+- a música é CONTÍNUA (nunca para nem recomeça nas transições);
+- andamento e grade são escolhidos para cada troca de cena cair num tempo da música;
+- a intensidade (bateria, brilho do pad, arpejo) sobe e desce suavemente junto com as cenas:
+  gancho (leve) → problema → solução → oferta (o ápice) → chamada final (fade);
+- prato reverso suave e "whoosh" bem baixo levam até cada corte.
 
 As trocas de cena vêm de (em ordem de preferência):
   1. --roteiro roteiro.json  (o mesmo JSON do design/reel.py; o tempo é exato)
@@ -225,127 +224,136 @@ def melhor_bpm(cenas, duracao, faixa):
 
 
 # ---------------------------------------------------------------- composição
-def compor(duracao: float, estilo="animado", seed=1, cenas: list[dict] | None = None,
-           entradas_texto=(0.35, 0.7)) -> np.ndarray:
+def grade(cenas, faixa):
+    """Andamento + deslocamento da grade para que os cortes caiam o mais perto possível de um tempo."""
+    cortes = np.array([c["inicio"] for c in cenas[1:]]) if len(cenas) > 1 else np.array([])
+    if not len(cortes):
+        return float(np.mean(faixa)), 0.0
+    melhor = (1e9, faixa[0], 0.0)
+    for bpm in np.arange(faixa[0], faixa[1] + 0.01, 0.25):
+        beat = 60 / bpm
+        for off in np.linspace(0, beat, 24, endpoint=False):
+            fase = ((cortes - off) / beat) % 1.0
+            erro = float(np.minimum(fase, 1 - fase).sum())
+            if erro < melhor[0]:
+                melhor = (erro, float(bpm), float(off))
+    return melhor[1], melhor[2]
+
+
+def compor(duracao: float, estilo="animado", seed=1, cenas: list[dict] | None = None) -> np.ndarray:
+    """Música CONTÍNUA (nunca para entre as cenas). A sincronia vem de:
+    - andamento/grade escolhidos para os cortes caírem nos tempos;
+    - a intensidade (bateria, brilho, arpejo) muda suavemente junto com a cena;
+    - prato reverso + whoosh baixinho levando até cada corte."""
     rng = np.random.default_rng(seed)
     cfg = ESTILOS[estilo]
     cenas = cenas or [{"inicio": 0.0, "transicao": 0.0, "nome": ""}]
     prog = PROGRESSOES[seed % len(PROGRESSOES)]
     tonica = TONICAS[seed % len(TONICAS)]
-    bpm = melhor_bpm(cenas, duracao, cfg["bpm"])
+    bpm, off = grade(cenas, cfg["bpm"])
     beat = 60 / bpm
     total = int((duracao + 0.05) * SR)
     L, R = np.zeros(total), np.zeros(total)
+    duck = np.ones(total)
 
-    def soma(sinal, ini, gl=1.0, gr=1.0, fim=None):
+    # curva de intensidade por papel da cena, com rampas suaves de 0,6 s
+    limites = [c["inicio"] for c in cenas] + [duracao]
+    alvo = {"intro": 0.35, "build": 0.6, "full": 0.85, "climax": 1.0, "outro": 0.85}
+    t_ax = np.arange(total) / SR
+    energia = np.zeros(total)
+    for ci, c in enumerate(cenas):
+        a, b = int(limites[ci] * SR), int(limites[ci + 1] * SR)
+        energia[a:b] = alvo[papel(c, ci, len(cenas))]
+    energia[int(limites[-2] * SR) if len(limites) > 1 else 0:] = energia[min(int(limites[-2] * SR), total - 1)]
+    k = int(0.6 * SR)
+    energia = np.convolve(np.pad(energia, (k, k), mode="edge"), np.ones(k) / k, mode="same")[k:-k]
+
+    def e_em(t):
+        return float(energia[min(max(int(t * SR), 0), total - 1)])
+
+    def soma(sinal, ini, gl=1.0, gr=1.0, sofre_duck=False):
         i = int(round(ini * SR))
         if i >= total or i + len(sinal) <= 0:
             return
         if i < 0:
             sinal, i = sinal[-i:], 0
-        lim = total if fim is None else min(total, int(fim * SR))
-        s = sinal[: max(lim - i, 0)]
-        if len(s) == 0:
-            return
-        if fim is not None and len(s) < len(sinal):  # corte limpo no fim da cena
-            k = min(int(0.008 * SR), len(s))
-            s = s.copy()
-            s[-k:] *= np.linspace(1, 0, k)
+        s = sinal[: total - i]
+        if sofre_duck:
+            s = s * duck[i:i + len(s)]
         L[i:i + len(s)] += s * gl
         R[i:i + len(s)] += s * gr
 
-    limites = [c["inicio"] for c in cenas] + [duracao]
-    n_cenas = len(cenas)
-    acorde_idx = 0
-    for ci, cena in enumerate(cenas):
-        ini, fim = limites[ci], limites[ci + 1]
-        kickv, clapv, hatv, baixov, arpv, oit = PAPEIS[papel(cena, ci, n_cenas)]
-        n_beats = int(np.ceil((fim - ini) / beat))
-        duck = np.ones(int((fim - ini) * SR) + 1)
-        sec_L, sec_R = np.zeros_like(duck), np.zeros_like(duck)
+    # grade contínua: começa um compasso antes do início para a música já entrar "andando"
+    primeiro = off - 4 * beat * int(np.ceil(off / (4 * beat)) or 0)
+    beats = np.arange(primeiro, duracao, beat)
 
-        def s_soma(sinal, t, gl=1.0, gr=1.0):  # dentro da seção, sofre o "pumping"
-            i = int(round(t * SR))
-            if i >= len(duck):
-                return
-            s = sinal[: len(duck) - i]
-            sec_L[i:i + len(s)] += s * gl
-            sec_R[i:i + len(s)] += s * gr
+    # 1) bateria (define o "pumping") — sempre presente, suave
+    for n, tb in enumerate(beats):
+        e = e_em(max(tb, 0))
+        if tb >= 0 and e >= 0.5:
+            soma(kick(int(0.45 * SR)) * 0.36 * cfg["kick"] * min(1, e + 0.1), tb)
+            i, m = int(tb * SR), int(0.3 * SR)
+            m = min(m, total - i)
+            if m > 0:
+                prof = 0.35 * e
+                duck[i:i + m] = np.minimum(duck[i:i + m], (1 - prof) + prof * np.linspace(0, 1, m) ** 0.6)
+        if n % 4 in (1, 3) and e >= 0.6:
+            soma(clap(int(0.3 * SR), rng) * 0.7 * e, tb, 0.95, 1.0)
+        for h in range(2):
+            aberto = h == 1 and e >= 0.8
+            soma(hat(int(0.25 * SR), rng, aberto) * cfg["hats"] * (0.45 if aberto else 0.55) * (0.4 + 0.6 * e),
+                 tb + h * beat / 2 + (0.01 if h else 0), 0.8, 1.0)
 
-        # acordes: troca na entrada da cena e a cada compasso dentro dela
-        for b0 in range(0, n_beats, 4):
-            grau, tipo = prog[acorde_idx % len(prog)]
-            acorde_idx += 1
-            raiz = tonica + grau
-            notas = [raiz + 12, raiz + 12 + (3 if tipo == "m" else 4), raiz + 19]
-            t_bar = b0 * beat
-            nbar = int(min(4, n_beats - b0) * beat * SR)
-            pad = sum(saw(hz(nt + d), nbar, rng.random()) for nt in notas for d in (-0.12, 0, 0.11))
-            brilho = 1300 + 900 * (arpv - 0.8) + 500 * oit
-            pad = lp(pad, brilho) * env(nbar, 0.06 if b0 else 0.01, 0.3, 0.8, 0.12) * 0.05
-            s_soma(pad, t_bar, 1.0, 0.85)
-            s_soma(np.roll(pad, int(0.012 * SR)), t_bar, 0.85, 1.0)
-            for b in range(min(4, n_beats - b0) * 2):  # baixo em colcheias
-                if baixov == 0:
-                    break
-                nb = int(beat / 2 * SR * 0.9)
-                f = hz(raiz - 12 + (12 if b % 2 else 0))
-                tb = np.arange(nb) / SR
-                som = (np.sin(2 * np.pi * f * tb) + 0.25 * lp(saw(f, nb), 900)) * env(nb, 0.003, 0.08, 0.5, 0.03)
-                s_soma(np.tanh(som * 1.4) * 0.22 * baixov, t_bar + b * beat / 2)
-            padrao = [0, 1, 2, 1, 2, 0, 2, 1] * 2  # arpejo em semicolcheias
-            for k, idx in enumerate(padrao[: int(min(4, n_beats - b0) * 4)]):
-                na = int(beat / 4 * SR)
-                f = hz(notas[idx] + 12 + 12 * oit * (k % 2))
-                ta = np.arange(na) / SR
-                som = (np.sin(2 * np.pi * f * ta) + 0.3 * np.sin(4 * np.pi * f * ta)) * np.exp(-ta * 14)
-                pan = 0.35 if k % 2 else -0.35
-                s_soma(som * 0.11 * arpv * cfg["arpejo"], t_bar + k * beat / 4, 1 - pan, 1 + pan)
-                s_soma(som * 0.045 * arpv * cfg["arpejo"], t_bar + k * beat / 4 + beat * 0.75, 1 + pan, 1 - pan)
+    # 2) harmonia em compassos contínuos (pad longo + baixo + arpejo)
+    for ci_bar, t_bar in enumerate(beats[::4]):
+        grau, tipo = prog[ci_bar % len(prog)]
+        raiz = tonica + grau
+        notas = [raiz + 12, raiz + 12 + (3 if tipo == "m" else 4), raiz + 19]
+        nbar = int(4 * beat * SR) + int(0.25 * SR)  # sobreposição leve: sem buracos entre compassos
+        e = e_em(max(t_bar, 0) + 2 * beat)
+        pad = sum(saw(hz(nt + d), nbar, rng.random()) for nt in notas for d in (-0.12, 0, 0.11))
+        pad = lp(pad, 1000 + 1100 * e) * env(nbar, 0.25, 0.4, 0.85, 0.3) * 0.05
+        soma(pad, t_bar, 1.0, 0.85, True)
+        soma(np.roll(pad, int(0.012 * SR)), t_bar, 0.85, 1.0, True)
+        for b in range(8):  # baixo
+            tb = t_bar + b * beat / 2
+            eb = e_em(max(tb, 0))
+            if eb < 0.5:
+                continue
+            nb = int(beat / 2 * SR * 0.92)
+            f = hz(raiz - 12 + (12 if b % 2 else 0))
+            tt = np.arange(nb) / SR
+            som = (np.sin(2 * np.pi * f * tt) + 0.2 * lp(saw(f, nb), 800)) * env(nb, 0.004, 0.08, 0.55, 0.03)
+            soma(np.tanh(som * 1.3) * 0.2 * eb, tb, 1, 1, True)
+        padrao = [0, 1, 2, 1, 2, 0, 2, 1] * 2
+        for k2, idx in enumerate(padrao):  # arpejo
+            ta0 = t_bar + k2 * beat / 4
+            ea = e_em(max(ta0, 0))
+            na = int(beat / 4 * SR)
+            f = hz(notas[idx] + 12 + (12 if ea > 0.95 and k2 % 2 else 0))
+            ta = np.arange(na) / SR
+            som = (np.sin(2 * np.pi * f * ta) + 0.25 * np.sin(4 * np.pi * f * ta)) * np.exp(-ta * 13)
+            pan = 0.35 if k2 % 2 else -0.35
+            g = 0.085 * cfg["arpejo"] * (0.55 + 0.45 * ea)
+            soma(som * g, ta0, 1 - pan, 1 + pan, True)
+            soma(som * g * 0.4, ta0 + beat * 0.75, 1 + pan, 1 - pan, True)
 
-        # bateria
-        for b in range(n_beats):
-            tb = b * beat
-            meia = kickv == 0.5
-            if kickv and (not meia or b % 2 == 0):
-                s_soma(kick(int(0.45 * SR)) * 0.5 * cfg["kick"], tb)
-                i, m = int(tb * SR), int(0.3 * SR)
-                m = min(m, len(duck) - i)
-                if m > 0:
-                    duck[i:i + m] = np.minimum(duck[i:i + m], 0.45 + 0.55 * np.linspace(0, 1, m) ** 0.6)
-            if clapv and b % 4 in (1, 3) and not (meia and b % 4 == 1):
-                s_soma(clap(int(0.3 * SR), rng), tb, 0.95, 1.0)
-            for h in range(2):
-                aberto = h == 1 and kickv == 1
-                s_soma(hat(int(0.25 * SR), rng, aberto) * hatv * cfg["hats"] * (0.55 if aberto else 0.7),
-                       tb + h * beat / 2 + (0.01 if h else 0), 0.8, 1.0)
+    # 3) transições: prato reverso suave + whoosh BAIXO até o corte (sem "boom", sem parar a música)
+    for c in cenas[1:]:
+        corte = c["inicio"]
+        td = max(c.get("transicao", 0.5), 0.35)
+        n = int((td + 0.35) * SR)
+        tt = np.arange(n) / SR
+        rev = hp(rng.standard_normal(n), 6000) * (tt / tt[-1]) ** 3 * 0.035
+        soma(rev, corte - n / SR, 0.9, 1.0)
+        w = whoosh(td + 0.2, rng) * 0.22  # bem baixo
+        soma(w, corte - len(w) / SR, 1.0, 0.9)
 
-        sec = np.stack([sec_L * duck, sec_R * duck])
-        n = sec.shape[1]
-        k = min(int(0.008 * SR), n)
-        sec[:, -k:] *= np.linspace(1, 0, k)
-        i = int(round(ini * SR))
-        m = min(n, total - i)
-        L[i:i + m] += sec[0, :m]
-        R[i:i + m] += sec[1, :m]
-
-        # transição: whoosh até o corte + impacto no corte
-        if ci > 0:
-            td = max(cena.get("transicao", 0.5), 0.35)
-            w = whoosh(td + 0.25, rng)
-            soma(w, ini - len(w) / SR, 0.9, 1.0)
-            soma(impacto(rng, 1.15 if papel(cena, ci, n_cenas) == "climax" else 0.85), ini)
-        # ticks na entrada dos textos (as animações da cena entram logo depois do corte)
-        for d in entradas_texto:
-            if ini + d < fim - 0.2:
-                soma(tick(rng), ini + d, 0.9, 1.1)
-
-    # final: acorde de resolução + impacto que ressoa no fim do vídeo
     mix = np.stack([L, R], axis=1)[: int(duracao * SR)]
     mix = hp(mix.T, 30).T
-    mix = np.tanh(mix * 1.6) / np.tanh(1.6)
-    fi, fo = int(0.03 * SR), int(min(1.4, duracao / 4) * SR)
-    mix[:fi] *= np.linspace(0, 1, fi)[:, None]
+    mix = np.tanh(mix * 1.4) / np.tanh(1.4)
+    fi, fo = int(0.4 * SR), int(min(1.6, duracao / 4) * SR)
+    mix[:fi] *= np.linspace(0, 1, fi)[:, None] ** 2
     mix[-fo:] *= (np.linspace(1, 0, fo) ** 1.4)[:, None]
     return (mix / (np.abs(mix).max() or 1) * 0.89).astype(np.float32)
 
