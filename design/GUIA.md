@@ -180,3 +180,11 @@ O vídeo precisa dar tempo de ler com calma no celular. Regra para a duração d
 - Cena com 5–8 palavras: ~5,5 s. Com 25–30 palavras: ~8–9 s (ou divida em duas cenas).
 - Transições de 0,7 s, suaves (wipe, slide, circleopen).
 - Reel total entre 20 e 35 s. Nunca acelere o texto para caber num tempo menor: corte texto ou crie outra cena.
+
+
+## Contato oficial
+
+- WhatsApp: **(88) 92100-8263**. Use o número na linha de apoio do CTA: "(88) 92100-8263 · link na bio".
+- Link da bio (mensagem pronta para saber que o cliente veio do Instagram):
+  https://wa.me/5588921008263?text=Ol%C3%A1%21%20Vi%20o%20perfil%20da%20JN%20Higieniza%C3%A7%C3%A3o%20no%20Instagram%20e%20quero%20um%20or%C3%A7amento.
+- Nas legendas: "Chame no WhatsApp (88) 92100-8263 ou pelo link na bio".
