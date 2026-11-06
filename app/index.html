@@ -85,6 +85,7 @@ dialog::backdrop{background:rgba(11,22,80,.45)}
 .folha input,.folha textarea{width:100%;padding:12px 14px;border:1.5px solid var(--linha);border-radius:var(--raio-p);background:#fff;font-size:16px}
 .folha textarea{min-height:220px;resize:vertical}
 .folha .linha-btn{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;margin-top:18px}
+.atalhos{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.atalhos button{padding:9px 14px;border-radius:20px;background:#E6ECFD;color:var(--royal);font-weight:600;font-size:14px}.atalhos button[aria-pressed=true]{background:var(--royal);color:#fff}
 .folha ol{padding-left:20px;font-size:14.5px;color:var(--tinta)} .folha ol li{margin:6px 0}
 .folha a{color:var(--royal);font-weight:600}
 .toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-b));transform:translate(-50%,20px);opacity:0;background:var(--noite);color:#fff;padding:12px 18px;border-radius:14px;font-weight:600;font-size:14.5px;transition:.25s;z-index:20;max-width:90vw;text-align:center}
@@ -123,6 +124,7 @@ dialog::backdrop{background:rgba(11,22,80,.45)}
 <dialog id="d-hora"><form method="dialog" class="folha">
   <h2>Mudar dia e horário</h2>
   <p>Horário de Brasília. O post sai até 1 hora depois do horário escolhido.</p>
+  <div class="atalhos" id="atalhos"></div>
   <input type="datetime-local" id="inp-hora" aria-label="Dia e horário">
   <div class="linha-btn"><button class="btn btn-sec" value="cancel">Cancelar</button><button class="btn btn-ok" value="ok">Salvar horário</button></div>
 </form></dialog>
@@ -279,7 +281,7 @@ async function agir(acao, art){
   if (acao==="legenda"){ $("#txt-legenda").value=it.dados.legenda||""; $("#d-legenda").showModal(); $("#d-legenda")._it=it; return }
   if (acao==="hora"){
     const d=new Date(it.dados.publicar_em), l=new Date(d.getTime()-3*3600e3);
-    $("#inp-hora").value=l.toISOString().slice(0,16); $("#d-hora").showModal(); $("#d-hora")._it=it; return }
+    $("#inp-hora").value=l.toISOString().slice(0,16); montarAtalhos(); $("#d-hora").showModal(); $("#d-hora")._it=it; return }
   const ops = {
     aprovar:[{aprovado:true, recusado:undefined},"Aprovado pelo app","Aprovado. Vai sair no horário."],
     recusar:[{aprovado:false, recusado:true},"Recusado pelo app","Recusado. Não vai ser publicado."],
@@ -320,6 +322,15 @@ $("#d-hora").addEventListener("close", async e=>{
   const iso=$("#inp-hora").value+":00-03:00";
   await executar(null, ()=>salvar(d._it,{publicar_em:iso},"Horário mudado pelo app"), "Horário salvo.");
 });
+function montarAtalhos(){
+  const hojeBR = new Date(Date.now()-3*3600e3);
+  const dia = n => { const d=new Date(hojeBR.getTime()+n*864e5); return d.toISOString().slice(0,10) };
+  const op = [["Hoje 12h",0,"12:00"],["Hoje 19h",0,"19:00"],["Amanhã 9h",1,"09:00"],["Amanhã 12h",1,"12:00"],["Amanhã 19h",1,"19:00"]];
+  const agora = hojeBR.toISOString().slice(0,16);
+  $("#atalhos").innerHTML = op.map(([t,n,h])=>{const v=`${dia(n)}T${h}`; return v>agora?`<button type="button" data-v="${v}">${t}</button>`:""}).join("");
+  $("#atalhos").querySelectorAll("button").forEach(b=>b.onclick=()=>{ $("#inp-hora").value=b.dataset.v;
+    $("#atalhos").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)) });
+}
 function abrirCfg(){ $("#inp-token").value=""; $("#d-cfg").showModal() }
 $("#cfg").addEventListener("click", abrirCfg);
 $("#d-cfg").addEventListener("close", async e=>{
