@@ -35,6 +35,6 @@ jobs:
         run: |
           git config user.name "jn-robo"
           git config user.email "jn-robo@users.noreply.github.com"
-          git add -A conteudo publicado FILA.md
+          git add -A FILA.md conteudo; [ -d publicado ] && git add -A publicado
           git diff --cached --quiet || git commit -m "Fila atualizada pelo robô"
           git pull --rebase && git push
