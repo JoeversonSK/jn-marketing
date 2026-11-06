@@ -26,8 +26,8 @@ const DEMO = {
   subtitulo: "Higienização de estofados na sua casa,\nem *Juazeiro do Norte* e *Barbalha*.",
   oferta: { valor: "20", para: "para os *10 primeiros*\nclientes" },
   itens: JN.ITENS_PADRAO,
-  cta: "Orçamento por foto no Direct",
-  cta_sub: "",
+  cta: "Chame no WhatsApp",
+  cta_sub: "link na bio · ou pelo Direct",
 };
 JN.montar((s) => `
 <div class="canvas f-oferta tema-${s.tema}">
@@ -40,7 +40,7 @@ JN.montar((s) => `
   </div>
   <div class="conteudo">
     <div class="topo">${JN.marca()}${s.selo ? `<span class="pilula">${JN.esc(s.selo)}</span>` : ""}</div>
-    <div style="height:80px"></div>
+    <div style="height:50px"></div>
     <div class="rotulo">${JN.rico(s.rotulo)}</div>
     <h1 class="display" data-fit="140">${JN.rico(s.titulo)}</h1>
     <p class="corpo sub">${JN.rico(s.subtitulo)}</p>

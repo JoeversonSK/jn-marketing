@@ -47,7 +47,7 @@
   .r-oferta .corpo { margin-top: 90px; font-size: 44px; }
 
   /* cta */
-  .r-cta .logo { width: 300px; margin-bottom: 70px; }
+  .r-cta .logo { width: 300px; height: 300px; margin-bottom: 80px; }
   .r-cta .titulo { font-size: 116px; }
   .r-cta .corpo { font-size: 46px; margin-top: 30px; }
   .r-cta .info { display: flex; align-items: center; gap: 20px; margin-top: 60px; font-size: 40px; font-weight: 500; color: var(--tx); }
@@ -56,7 +56,7 @@
 
   /* capa (grade 4:5 central: y 285..1635) */
   .r-capa .conteudo { justify-content: center; }
-  .r-capa .simbolo { width: 200px; height: 200px; margin-bottom: 70px; }
+  .r-capa .simbolo { width: 280px; height: 280px; margin-bottom: 80px; }
   .r-capa .display { font-size: 150px; line-height: .92; }
   .r-capa .corpo { margin-top: 44px; font-size: 46px; max-width: 860px; }
 </style>
@@ -73,13 +73,13 @@ const PADROES = {
   ] },
   solucao: { tema: "royal", rotulo: "A solução", titulo: "Higienização profunda, *na sua casa.*", itens: null, texto: "" },
   oferta: { tema: "noite", selo: "Inauguração", oferta: { valor: "20", para: "para os *10 primeiros*\nclientes" }, texto: "Juazeiro do Norte e Barbalha" },
-  cta: { tema: "gelo", titulo: "Peça seu orçamento *por foto.*", texto: "Mande uma foto do estofado no *Direct* ou *WhatsApp*.", info: "Sábados a partir das 12h, domingos e feriados", instagram: "@jn_.higienizacao" },
+  cta: { tema: "gelo", titulo: "Peça seu orçamento *no WhatsApp.*", texto: "O link está na bio. Se preferir, chame no *Direct*.", info: "Sábados a partir das 12h, domingos e feriados", instagram: "@jn_.higienizacao" },
 };
 const A = (tipo, atraso) => `a a-${tipo}" style="animation-delay:${atraso}s`;
 
 const CENAS = {
   capa: (s) => `
-    <img class="simbolo" src="../logo-simbolo.svg" alt="">
+    <img class="logo-oficial simbolo" src="${JN.LOGO}" alt="JN Higienização">
     <div class="rotulo">${JN.rico(s.rotulo)}</div>
     <h1 class="display">${JN.rico(s.titulo)}</h1>
     <p class="corpo">${JN.rico(s.texto)}</p>`,
@@ -104,7 +104,7 @@ const CENAS = {
     ${JN.oferta(s.oferta, 330, { x: -300, y: -70, r: -40, b: -90 }, { fundo: "escala:0.15", valor: "escala:0.3", quem: "sobe:0.9" })}
     <p class="corpo ${A("surge", 1.4)}">${JN.rico(s.texto)}</p>`,
   cta: (s) => `
-    <img class="logo ${A("escala", 0.05)}" src="../logo.svg" alt="JN Higienização">
+    <img class="logo-oficial logo ${A("escala", 0.05)}" src="${JN.LOGO}" alt="JN Higienização">
     <h2 class="titulo ${A("sobe", 0.35)}">${JN.rico(s.titulo)}</h2>
     <p class="corpo ${A("sobe", 0.6)}">${JN.rico(s.texto)}</p>
     <div class="info ${A("surge", 1.0)}">${JN.ico("calendario", 56, "", 3.4)}<span>${JN.rico(s.info)}</span></div>

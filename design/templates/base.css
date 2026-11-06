@@ -13,8 +13,7 @@
 
 :root {
   /* paleta */
-  --royal: #1C3AC4;
-  --royal-claro: #2C4FDB;
+  --royal: #023AAB;       /* azul do logo oficial (medido no arquivo da marca) */
   --noite: #0B1650;
   --noite-2: #12207A;
   --agua: #5EC8F2;
@@ -69,10 +68,13 @@ body { -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; 
 .ponto   { color: var(--agua); }
 
 /* ---------- assinatura da marca ---------- */
-.marca { display: flex; align-items: center; gap: 18px; }
-.marca img { width: 68px; height: 68px; display: block; }
-.marca span { font-family: var(--f-display); font-weight: 700; font-size: 30px; letter-spacing: -0.01em; color: var(--tx); line-height: 1; }
-.marca span em { font-style: normal; font-weight: 500; opacity: .72; }
+/* logo oficial (design/logo-oficial/logo.png). Não redesenhar. Em fundo escuro ou royal
+   recebe um anel branco fino para não se misturar ao azul. */
+.marca { display: flex; align-items: center; }
+.marca img, img.logo-oficial { display: block; width: 116px; height: 116px; border-radius: 50%; }
+.tema-noite .marca img, .tema-royal .marca img,
+.tema-noite img.logo-oficial, .tema-royal img.logo-oficial { box-shadow: 0 0 0 4px var(--branco); }
+.tema-gelo .marca img, .tema-gelo img.logo-oficial { box-shadow: 0 6px 18px rgba(2,58,171,.18); }
 
 .topo { display: flex; align-items: center; justify-content: space-between; }
 

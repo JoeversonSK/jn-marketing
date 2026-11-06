@@ -107,12 +107,15 @@
   JN.esc = esc;
 
   /* ---------- assinatura ---------- */
-  JN.marca = (comNome = true) =>
-    `<div class="marca"><img src="../logo-simbolo.svg" alt="">${comNome ? "<span>JN Higienização</span>" : ""}</div>`;
+  /* assinatura = logo oficial (PNG recortado a partir do arquivo da marca) */
+  JN.LOGO = "../logo-oficial/logo.png";
+  JN.marca = (tam = 116) =>
+    `<div class="marca"><img src="${JN.LOGO}" alt="JN Higienização" style="width:${tam}px;height:${tam}px"></div>`;
   JN.rodape = (s = {}) =>
     `<div class="rodape"><span class="handle">${esc(s.instagram || "@jn_.higienizacao")}</span><span>${s.rodape_dir ? JN.rico(s.rodape_dir) : esc(s.cidades || "Juazeiro do Norte · Barbalha")}</span></div>`;
-  JN.cta = (texto, sub, variante = "") =>
-    `<div class="cta ${variante}"><div>${JN.rico(texto)}${sub ? `<small>${JN.rico(sub)}</small>` : ""}</div><span class="seta">${JN.ico("seta", 44, "", 4)}</span></div>`;
+  /* botão de ação. O ícone padrão é o balão de conversa (desenho próprio, não é o logo do WhatsApp) */
+  JN.cta = (texto, sub, variante = "", icone = "chat") =>
+    `<div class="cta ${variante}"><div>${JN.rico(texto)}${sub ? `<small>${JN.rico(sub)}</small>` : ""}</div><span class="seta">${JN.ico(icone, icone === "seta" ? 44 : 48, "", icone === "seta" ? 4 : 3.6)}</span></div>`;
   /* bloco de oferta; fundo = {seed, ...} desenha um blob royal preso ao bloco */
   /* anim: { fundo|valor|quem: "tipo:atraso" } ex.: "escala:0.3" (usado nos reels) */
   const an = (v) => { if (!v) return ["", ""]; const [t, d] = v.split(":"); return [`a a-${t}`, `animation-delay:${d || 0}s;`]; };
@@ -170,6 +173,7 @@
           avisos.push(`texto na zona de interface do story: ${nomeEl(el)} "${el.textContent.trim().slice(0, 30)}"`);
       }
     });
+    cv.querySelectorAll("img").forEach((im) => { if (!im.naturalWidth) avisos.push(`imagem não carregou: ${im.getAttribute("src")}`); });
     const c = cv.querySelector(".conteudo");
     if (c && c.scrollHeight > c.clientHeight + 2) avisos.push(`conteúdo excede a área útil em ${c.scrollHeight - c.clientHeight}px`);
     return [...new Set(avisos)];

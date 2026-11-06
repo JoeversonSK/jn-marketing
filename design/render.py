@@ -34,6 +34,7 @@ from playwright.sync_api import sync_playwright
 
 DESIGN = Path(__file__).resolve().parent
 TEMPLATES = DESIGN / "templates"
+LOGO_OFICIAL = DESIGN / "logo-oficial" / "logo.png"  # gerado por tools/extrair_logo_oficial.py
 
 
 def caminho_template(nome: str) -> Path:
@@ -46,6 +47,8 @@ def caminho_template(nome: str) -> Path:
 
 def abrir_template(page, template: str, dados: dict, animar: bool = False):
     """Carrega o template com os dados e espera fontes/imagens. Retorna (largura, altura)."""
+    if not LOGO_OFICIAL.exists():
+        raise SystemExit(f"Logo oficial não encontrado em {LOGO_OFICIAL}. Rode: python3 design/tools/extrair_logo_oficial.py")
     init = f"window.SPEC = {json.dumps(dados, ensure_ascii=False)}; window.ANIMAR = {str(animar).lower()};"
     # add_init_script acumula por página; usamos uma página nova por peça
     page.add_init_script(init)

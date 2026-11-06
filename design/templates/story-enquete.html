@@ -8,11 +8,11 @@
 <html lang="pt-BR"><head><meta charset="utf-8">
 <link rel="stylesheet" href="base.css">
 <style>
-  .s-enq .linha1 { display: flex; align-items: center; justify-content: space-between; margin-top: 56px; }
+  .s-enq .linha1 { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }
   .s-enq .titulo { font-size: 100px; margin-top: 36px; }
   .s-enq .dica { display: flex; align-items: center; gap: 14px; margin-top: 54px; font-weight: 600; font-size: 30px; letter-spacing: .12em; text-transform: uppercase; color: var(--acento); }
   .s-enq .dica .ico { width: 40px; height: 40px; }
-  .s-enq .livre { flex: 1; min-height: 360px; }
+  .s-enq .livre { flex: 1; min-height: 340px; }
   .s-enq .texto { font-size: 40px; max-width: 860px; }
   .s-enq .rodape { margin-top: 34px; }
 </style>
@@ -25,7 +25,7 @@ const DEMO = {
   pergunta: "Quando foi a última vez que seu sofá foi *higienizado?*",
   icone: "sofa",
   dica_sticker: "Responda na enquete",
-  texto: "Faz tempo? Mande uma foto no *Direct* e receba seu orçamento.",
+  texto: "Faz tempo? Chame a gente no *WhatsApp* (link na bio) e peça seu orçamento.",
 };
 JN.montar((s) => `
 <div class="canvas story s-enq tema-${s.tema}">

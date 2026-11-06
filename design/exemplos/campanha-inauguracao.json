@@ -1,53 +1,159 @@
 {
   "saida": "../../../design-out",
   "pecas": [
-    {"template": "feed-oferta", "arquivo": "01-post-inauguracao.jpg", "dados": {
-      "tema": "noite", "selo": "Inauguração", "rotulo": "Agora no Cariri", "titulo": "Chegamos*.*",
-      "subtitulo": "Higienização de estofados na sua casa,\nem *Juazeiro do Norte* e *Barbalha*.",
-      "oferta": {"valor": "20", "para": "para os *10 primeiros*\nclientes"},
-      "cta": "Orçamento por foto no Direct"}},
-    {"template": "story-oferta", "arquivo": "02-story-inauguracao.jpg", "dados": {
-      "tema": "noite", "selo": "Inauguração", "rotulo": "Agora no Cariri", "titulo": "Chegamos*.*",
-      "subtitulo": "Higienização de estofados na sua casa,\nem *Juazeiro do Norte* e *Barbalha*.",
-      "oferta": {"valor": "20", "para": "para os *10 primeiros* clientes"},
-      "cta": "Mande uma foto no Direct", "cta_sub": "e receba seu orçamento"}},
-    {"template": "story-agenda", "arquivo": "04-story-agenda-sabado.jpg", "dados": {
-      "tema": "royal", "dia": "Inauguração", "rotulo": "Sábado, 7 de novembro", "titulo": "Agenda\naberta\n*hoje.*",
-      "horario_rotulo": "a partir das", "horario": "12h", "aviso": "Vagas limitadas",
-      "linha_oferta": "_20% OFF_ para os 10 primeiros clientes",
-      "cta": "Garanta seu horário", "cta_sub": "Mande uma foto no Direct ou WhatsApp"}},
-    {"template": "carrossel-capa", "arquivo": "05-carrossel-5-sinais-01.jpg", "dados": {
-      "tema": "royal", "rotulo": "Guia rápido", "numero": "5",
-      "titulo": "sinais de que seu sofá precisa de *higienização*", "icone": "sofa"}},
-    {"template": "carrossel-item", "arquivo": "05-carrossel-5-sinais-02.jpg", "dados": {
-      "numero": 1, "total_itens": 5, "rotulo": "Sinal", "icone": "mancha", "seed": 3,
-      "titulo": "Manchas que não saem",
-      "texto": "Café, suor e gordura penetram nas fibras. Pano úmido e produto caseiro só espalham a~sujeira."}},
-    {"template": "carrossel-item", "arquivo": "05-carrossel-5-sinais-03.jpg", "dados": {
-      "numero": 2, "total_itens": 5, "rotulo": "Sinal", "icone": "odor", "seed": 8,
-      "titulo": "Cheiro que não vai embora",
-      "texto": "Suor, xixi de pet e umidade ficam presos na espuma. O perfume disfarça, mas o odor~volta."}},
-    {"template": "carrossel-item", "arquivo": "05-carrossel-5-sinais-04.jpg", "dados": {
-      "numero": 3, "total_itens": 5, "rotulo": "Sinal", "icone": "acaro", "seed": 5,
-      "titulo": "Espirros e coceira no sofá",
-      "texto": "Ácaros e poeira se acumulam no estofado e podem piorar rinite e alergias de quem mora na~casa."}},
-    {"template": "carrossel-item", "arquivo": "05-carrossel-5-sinais-05.jpg", "dados": {
-      "numero": 4, "total_itens": 5, "rotulo": "Sinal", "icone": "encardido", "seed": 12,
-      "titulo": "Tecido encardido",
-      "texto": "Braços e assento mais escuros que o resto? É gordura da pele e sujeira do dia a dia, acumuladas no~tecido."}},
-    {"template": "carrossel-item", "arquivo": "05-carrossel-5-sinais-06.jpg", "dados": {
-      "numero": 5, "total_itens": 5, "rotulo": "Sinal", "icone": "calendario", "seed": 2,
-      "titulo": "6 meses sem higienizar",
-      "texto": "O ideal é fazer a higienização profunda a cada 6 a 12 meses, ou antes se há crianças e pets em~casa."}},
-    {"template": "carrossel-cta", "arquivo": "05-carrossel-5-sinais-07.jpg", "dados": {
-      "tema": "noite", "rotulo": "E aí?", "titulo": "Marcou algum sinal*?*",
-      "texto": "A higienização profunda tira a sujeira que a limpeza do dia a dia não alcança.",
-      "oferta": {"valor": "20", "para": "para os *10~primeiros* clientes"},
-      "cta": "Peça seu orçamento por foto", "cta_sub": "no Direct ou WhatsApp"}},
-    {"template": "story-enquete", "arquivo": "06-story-enquete-domingo.jpg", "dados": {
-      "tema": "gelo", "rotulo": "Pergunta rápida",
-      "pergunta": "Quando foi a última vez que seu sofá foi *higienizado?*", "icone": "sofa",
-      "dica_sticker": "Responda na enquete",
-      "texto": "Faz tempo? Mande uma foto no *Direct* e receba seu orçamento."}}
+    {
+      "template": "feed-oferta",
+      "arquivo": "01-post-inauguracao.jpg",
+      "dados": {
+        "tema": "noite",
+        "selo": "Inauguração",
+        "rotulo": "Agora no Cariri",
+        "titulo": "Chegamos*.*",
+        "subtitulo": "Higienização de estofados na sua casa,\nem *Juazeiro do Norte* e *Barbalha*.",
+        "oferta": {
+          "valor": "20",
+          "para": "para os *10 primeiros*\nclientes"
+        },
+        "cta": "Chame no WhatsApp",
+        "cta_sub": "link na bio · ou pelo Direct"
+      }
+    },
+    {
+      "template": "story-oferta",
+      "arquivo": "02-story-inauguracao.jpg",
+      "dados": {
+        "tema": "noite",
+        "selo": "Inauguração",
+        "rotulo": "Agora no Cariri",
+        "titulo": "Chegamos*.*",
+        "subtitulo": "Higienização de estofados na sua casa,\nem *Juazeiro do Norte* e *Barbalha*.",
+        "oferta": {
+          "valor": "20",
+          "para": "para os *10 primeiros* clientes"
+        },
+        "cta": "Peça seu orçamento no WhatsApp",
+        "cta_sub": "link na bio · ou pelo Direct"
+      }
+    },
+    {
+      "template": "story-agenda",
+      "arquivo": "04-story-agenda-sabado.jpg",
+      "dados": {
+        "tema": "royal",
+        "dia": "Inauguração",
+        "rotulo": "Sábado, 7 de novembro",
+        "titulo": "Agenda\naberta\n*hoje.*",
+        "horario_rotulo": "a partir das",
+        "horario": "12h",
+        "aviso": "Vagas limitadas",
+        "linha_oferta": "_20% OFF_ para os 10 primeiros clientes",
+        "cta": "Garanta seu horário no WhatsApp",
+        "cta_sub": "link na bio · ou pelo Direct"
+      }
+    },
+    {
+      "template": "carrossel-capa",
+      "arquivo": "05-carrossel-5-sinais-01.jpg",
+      "dados": {
+        "tema": "royal",
+        "rotulo": "Guia rápido",
+        "numero": "5",
+        "titulo": "sinais de que seu sofá precisa de *higienização*",
+        "icone": "sofa"
+      }
+    },
+    {
+      "template": "carrossel-item",
+      "arquivo": "05-carrossel-5-sinais-02.jpg",
+      "dados": {
+        "numero": 1,
+        "total_itens": 5,
+        "rotulo": "Sinal",
+        "icone": "mancha",
+        "seed": 3,
+        "titulo": "Manchas que não saem",
+        "texto": "Café, suor e gordura penetram nas fibras. Pano úmido e produto caseiro só espalham a~sujeira."
+      }
+    },
+    {
+      "template": "carrossel-item",
+      "arquivo": "05-carrossel-5-sinais-03.jpg",
+      "dados": {
+        "numero": 2,
+        "total_itens": 5,
+        "rotulo": "Sinal",
+        "icone": "odor",
+        "seed": 8,
+        "titulo": "Cheiro que não vai embora",
+        "texto": "Suor, xixi de pet e umidade ficam presos na espuma. O perfume disfarça, mas o odor~volta."
+      }
+    },
+    {
+      "template": "carrossel-item",
+      "arquivo": "05-carrossel-5-sinais-04.jpg",
+      "dados": {
+        "numero": 3,
+        "total_itens": 5,
+        "rotulo": "Sinal",
+        "icone": "acaro",
+        "seed": 5,
+        "titulo": "Espirros e coceira no sofá",
+        "texto": "Ácaros e poeira se acumulam no estofado e podem piorar rinite e alergias de quem mora na~casa."
+      }
+    },
+    {
+      "template": "carrossel-item",
+      "arquivo": "05-carrossel-5-sinais-05.jpg",
+      "dados": {
+        "numero": 4,
+        "total_itens": 5,
+        "rotulo": "Sinal",
+        "icone": "encardido",
+        "seed": 12,
+        "titulo": "Tecido encardido",
+        "texto": "Braços e assento mais escuros que o resto? É gordura da pele e sujeira do dia a dia, acumuladas no~tecido."
+      }
+    },
+    {
+      "template": "carrossel-item",
+      "arquivo": "05-carrossel-5-sinais-06.jpg",
+      "dados": {
+        "numero": 5,
+        "total_itens": 5,
+        "rotulo": "Sinal",
+        "icone": "calendario",
+        "seed": 2,
+        "titulo": "6 meses sem higienizar",
+        "texto": "O ideal é fazer a higienização profunda a cada 6 a 12 meses, ou antes se há crianças e pets em~casa."
+      }
+    },
+    {
+      "template": "carrossel-cta",
+      "arquivo": "05-carrossel-5-sinais-07.jpg",
+      "dados": {
+        "tema": "noite",
+        "rotulo": "E aí?",
+        "titulo": "Marcou algum sinal*?*",
+        "texto": "A higienização profunda tira a sujeira que a limpeza do dia a dia não alcança.",
+        "oferta": {
+          "valor": "20",
+          "para": "para os *10~primeiros* clientes"
+        },
+        "cta": "Peça seu orçamento no WhatsApp",
+        "cta_sub": "link na bio · ou pelo Direct"
+      }
+    },
+    {
+      "template": "story-enquete",
+      "arquivo": "06-story-enquete-domingo.jpg",
+      "dados": {
+        "tema": "gelo",
+        "rotulo": "Pergunta rápida",
+        "pergunta": "Quando foi a última vez que seu sofá foi *higienizado?*",
+        "icone": "sofa",
+        "dica_sticker": "Responda na enquete",
+        "texto": "Faz tempo? Chame a gente no *WhatsApp* (link na bio) e peça seu orçamento."
+      }
+    }
   ]
 }

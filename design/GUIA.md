@@ -8,26 +8,29 @@ Os templates em `templates/` já seguem estas regras. Use-os em vez de montar ar
 **Limpo, confiável e perto de você.** A JN entra na casa do cliente, então a comunicação precisa passar segurança, frescor e organização.
 O visual tem muito respiro, tipografia forte, azul profundo e formas de água desenhadas à mão (bolhas e gotas).
 
-## 2. Logo
+## 2. Logo (oficial)
+
+O logo oficial é o arquivo enviado pelo dono: um círculo azul (#023AAB) com "JN" branco, uma estrela de brilho azul-clara com duas gotas saindo do N e "HIGIENIZAÇÃO" embaixo, tudo dentro do círculo. **Não redesenhe, não "melhore" e não recrie em vetor.** Use os arquivos abaixo.
 
 | Arquivo | Uso |
 |---|---|
-| `logo.svg` | Assinatura completa (símbolo + HIGIENIZAÇÃO) sobre fundo claro |
-| `logo-branco.svg` | Assinatura completa sobre fundo azul-noite ou royal |
-| `logo-simbolo.svg` | Só o círculo "JN": avatar, selo de canto, marca d'água |
+| `logo-oficial/logo-original.jpg` | Arquivo-fonte da marca (fundo branco). Não usar direto nas peças |
+| `logo-oficial/logo.png` | Logo recortado, fundo transparente, 1024 px. Usado em todas as peças |
+| `logo-oficial/simbolo.png` | O mesmo logo em 256 px, para avatar e usos pequenos |
 
-- São SVGs 100% vetoriais: o texto foi convertido em contorno, então não dependem de fonte instalada. Para regenerar, rode `python3 design/tools/gerar_logo.py`.
-- Área de proteção: ao redor do logo, deixe livre no mínimo **metade do diâmetro do círculo**.
-- Tamanho mínimo: símbolo com 64 px num canvas de 1080 px.
-- Não distorça, não gire, não aplique sombra nem contorno, não troque as cores e não coloque o logo sobre foto.
+- Os PNGs são gerados por `python3 design/tools/extrair_logo_oficial.py`. O script só recorta o círculo com borda antisserrilhada, remove o halo branco do JPG e o ruído de compressão no azul chapado. Forma, cores e proporções ficam intactas.
+- Os templates usam o logo pela função `JN.marca()` (topo de cada peça, 116 px) e pela classe `img.logo-oficial` (capa e fechamento do Reel).
+- **Contraste:** em fundo azul-noite ou royal, o logo leva um **anel branco de 4 px**, porque o círculo azul se mistura ao fundo. Em fundo gelo ou branco, não leva anel, só uma sombra azul suave. Nunca coloque o logo sobre foto ou sobre o limão.
+- Área de proteção: no mínimo 1/3 do diâmetro livre ao redor. Tamanho mínimo: 96 px num canvas de 1080 px. Abaixo disso o "HIGIENIZAÇÃO" interno some, então prefira o @ por escrito.
+- Não distorça, não gire, não recolora, não aplique contorno colorido nem efeito, e não separe o "JN" do círculo.
+- Os logos recriados anteriormente (`logo.svg`, `logo-branco.svg`, `logo-simbolo.svg`) foram **removidos**. O oficial manda.
 
 ## 3. Paleta
 
 | Token | Hex | Papel |
 |---|---|---|
 | `--noite` | `#0B1650` | Fundo principal das peças de campanha e texto sobre fundo claro |
-| `--royal` | `#1C3AC4` | Cor da marca: fundos, selos de ícone, blobs de destaque |
-| `--royal-claro` | `#2C4FDB` | Só para a onda interna do logo |
+| `--royal` | `#023AAB` | Cor da marca, medida no logo oficial: fundos, selos de ícone, blobs de destaque (antes era #1C3AC4) |
 | `--noite-2` | `#12207A` | Blobs de fundo sobre azul-noite (contraste sutil) |
 | `--agua` | `#5EC8F2` | Acento: palavra-chave, ícones de linha, bolhas |
 | `--agua-clara` | `#78C8FF` | Acento sobre fundo royal |
@@ -73,7 +76,7 @@ As fontes ficam em `fonts/` e são carregadas localmente (licença OFL). Nada ve
 2. Uma frase de apoio (corpo).
 3. Informação de serviço (itens, horário).
 4. Ação: botão limão (CTA) com seta.
-5. Assinatura: símbolo + "JN Higienização" no topo, @ e cidades no rodapé.
+5. Assinatura: logo oficial no topo, @ e cidades no rodapé.
 
 Teste: com a imagem reduzida a 25% (tamanho do celular no feed), o foco e o CTA precisam continuar legíveis.
 
@@ -91,7 +94,9 @@ Teste: com a imagem reduzida a 25% (tamanho do celular no feed), o foco e o CTA 
 - Fale do benefício concreto: "tira a sujeira que a limpeza do dia a dia não alcança".
 - Sem promessas que não dá para provar ("elimina 100% das bactérias", "o melhor do Cariri").
 - Seja específico no que for verificável: cidades, dias e horários, itens atendidos, condição da oferta.
-- Todo post termina com o CTA: **orçamento por foto no Direct ou WhatsApp**.
+- Todo post termina com um CTA que **chama para conversar, com o WhatsApp como canal principal**: "Chame no WhatsApp", "Fale com a gente no WhatsApp", "Peça seu orçamento no WhatsApp". O Direct aparece como segunda opção quando couber ("WhatsApp ou Direct"). Para indicar onde está o contato, use **"link na bio"** (não divulgamos número na arte).
+- **Não peça foto no CTA.** A foto do estofado é pedida depois, na conversa. Evite "orçamento por foto" e "mande uma foto".
+- No botão de ação, use o ícone de balão de conversa da marca (`chat`), nunca o logo do WhatsApp.
 - No máximo 3 emojis por legenda e de 5 a 8 hashtags do conjunto: #higienizacaodeestofados #juazeirodonorte #barbalha #cariri #limpezadesofa #higienizacaodecolchao #juazeirodonortece #caririce.
 
 ## 9. Nunca faça
@@ -112,9 +117,9 @@ Teste: com a imagem reduzida a 25% (tamanho do celular no feed), o foco e o CTA 
 - [ ] `render.py` terminou sem avisos (texto cortado, fora da área, zona do story)?
 - [ ] Há um único foco visual e um único CTA?
 - [ ] As margens de 80 px e o alinhamento à esquerda foram respeitados? A decoração não encosta em texto?
-- [ ] A assinatura (símbolo no topo, @ no rodapé) está presente?
+- [ ] A assinatura (logo oficial no topo, com anel branco em fundo escuro, e @ no rodapé) está presente e nítida?
 - [ ] As informações estão corretas: oferta (20% OFF, 10 primeiros), cidades, dias e horários?
-- [ ] A legenda está pronta, com no máximo 3 emojis, o CTA de orçamento por foto e de 5 a 8 hashtags?
+- [ ] A legenda está pronta, com no máximo 3 emojis, o CTA para o WhatsApp (sem pedir foto) e de 5 a 8 hashtags?
 - [ ] Reel: 12 a 20 s, 1080×1920, H.264 yuv420p e capa com o texto dentro do recorte 4:5? Conferi 4 ou 5 quadros extraídos?
 - [ ] Story: a área para sticker (enquete, link) ficou livre?
 
