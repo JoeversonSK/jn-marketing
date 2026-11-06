@@ -7,7 +7,6 @@ O sistema publica sozinho quando chegar o horário (confere a cada 10 minutos).
 
 | Quando | Tipo | Prévia | Legenda | Situação | Pasta |
 | --- | --- | --- | --- | --- | --- |
-| 06/11 15:00 | story | <img src="conteudo/2026-11-06-1500-story-destaque-servicos/01.jpg" width="90"> |  | 🟢 aprovado | `conteudo/2026-11-06-1500-story-destaque-servicos` |
 | 06/11 17:00 | story | <img src="conteudo/2026-11-06-1700-story-destaque-como-funciona/01.jpg" width="90"> |  | 🟢 aprovado | `conteudo/2026-11-06-1700-story-destaque-como-funciona` |
 | 06/11 19:00 | story | <img src="conteudo/2026-11-06-1900-story-destaque-contato/01.jpg" width="90"> |  | 🟢 aprovado | `conteudo/2026-11-06-1900-story-destaque-contato` |
 | 07/11 09:00 | story | <img src="conteudo/2026-11-07-0900-story-agenda-sabado/01.jpg" width="90"> |  | 🟢 aprovado | `conteudo/2026-11-07-0900-story-agenda-sabado` |
@@ -18,5 +17,6 @@ O sistema publica sozinho quando chegar o horário (confere a cada 10 minutos).
 
 | Quando | Tipo | Prévia | Legenda | Situação | Pasta |
 | --- | --- | --- | --- | --- | --- |
+| 06/11 15:00 | story | <img src="publicado/2026-11-06-1500-story-destaque-servicos/01.jpg" width="90"> |  | ✅ publicado | `publicado/2026-11-06-1500-story-destaque-servicos` |
 | 06/11 14:00 | story | <img src="publicado/2026-11-06-1910-story-inauguracao/01.jpg" width="90"> |  | ✅ publicado | `publicado/2026-11-06-1910-story-inauguracao` |
 | 06/11 13:00 | post | <img src="publicado/2026-11-06-1900-post-inauguracao/01.jpg" width="90"> | Chegamos! ✨ | ✅ publicado | `publicado/2026-11-06-1900-post-inauguracao` |
