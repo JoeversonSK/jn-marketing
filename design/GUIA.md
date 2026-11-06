@@ -185,6 +185,5 @@ O vídeo precisa dar tempo de ler com calma no celular. Regra para a duração d
 ## Contato oficial
 
 - WhatsApp: **(88) 92100-8263**. Use o número na linha de apoio do CTA: "(88) 92100-8263 · link na bio".
-- Link da bio (mensagem pronta para saber que o cliente veio do Instagram):
-  https://joeversonsk.github.io/jn-marketing/whatsapp/ (abre o WhatsApp com a mensagem "Olá! Vi o perfil da JN Higienização no Instagram e quero um orçamento.")
+- Link da bio: https://wa.me/5588921008263 (link padrão do WhatsApp, sem mensagem pronta).
 - Nas legendas: "Chame no WhatsApp (88) 92100-8263 ou pelo link na bio".

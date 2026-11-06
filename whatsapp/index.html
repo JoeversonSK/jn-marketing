@@ -25,7 +25,7 @@
   // A mensagem é montada aqui (codificada uma única vez), para nenhum app intermediário estragar o texto.
   const numero = "5588921008263";
   const texto = "Olá! Vi o perfil da JN Higienização no Instagram e quero um orçamento.";
-  const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(texto);
+  const url = "https://wa.me/" + numero;
   document.getElementById("ir").href = url;
   location.replace(url);
 </script>
