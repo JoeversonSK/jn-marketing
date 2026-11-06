@@ -35,7 +35,7 @@ def atualizar() -> None:
         "# Fila de conteúdo — JN Higienização",
         "",
         "Para aprovar, use o app no celular: https://joeversonsk.github.io/jn-marketing/app/",
-        "O sistema publica sozinho quando chegar o horário (confere a cada hora).",
+        "O sistema publica sozinho quando chegar o horário (confere a cada 10 minutos).",
         "",
         "## Programados",
         "",

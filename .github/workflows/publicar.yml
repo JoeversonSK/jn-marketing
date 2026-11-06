@@ -2,7 +2,7 @@ name: Publicar no Instagram
 
 on:
   schedule:
-    - cron: "17 * * * *"      # de hora em hora (o GitHub pode atrasar alguns minutos)
+    - cron: "*/10 * * * *"    # a cada 10 minutos (o GitHub pode atrasar alguns minutos)
   push:
     branches: [main]
     paths: ["conteudo/**"]   # quando um post é adicionado ou aprovado

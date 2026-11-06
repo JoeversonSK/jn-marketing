@@ -123,7 +123,7 @@ dialog::backdrop{background:rgba(11,22,80,.45)}
 
 <dialog id="d-hora"><form method="dialog" class="folha">
   <h2>Mudar dia e horário</h2>
-  <p>Horário de Brasília. O post sai até 1 hora depois do horário escolhido.</p>
+  <p>Horário de Brasília. O post sai em poucos minutos depois do horário escolhido.</p>
   <div class="atalhos" id="atalhos"></div>
   <input type="datetime-local" id="inp-hora" aria-label="Dia e horário">
   <div class="linha-btn"><button class="btn btn-sec" value="cancel">Cancelar</button><button class="btn btn-ok" value="ok">Salvar horário</button></div>
@@ -325,7 +325,7 @@ $("#d-hora").addEventListener("close", async e=>{
 function montarAtalhos(){
   const hojeBR = new Date(Date.now()-3*3600e3);
   const dia = n => { const d=new Date(hojeBR.getTime()+n*864e5); return d.toISOString().slice(0,10) };
-  const op = [["Hoje 12h",0,"12:00"],["Hoje 19h",0,"19:00"],["Amanhã 9h",1,"09:00"],["Amanhã 12h",1,"12:00"],["Amanhã 19h",1,"19:00"]];
+  const op = [["Hoje 12h",0,"12:00"],["Hoje 19h",0,"19:00"],["Hoje 21h",0,"21:00"],["Amanhã 9h",1,"09:00"],["Amanhã 12h",1,"12:00"],["Amanhã 19h",1,"19:00"],["Amanhã 21h",1,"21:00"]];
   const agora = hojeBR.toISOString().slice(0,16);
   $("#atalhos").innerHTML = op.map(([t,n,h])=>{const v=`${dia(n)}T${h}`; return v>agora?`<button type="button" data-v="${v}">${t}</button>`:""}).join("");
   $("#atalhos").querySelectorAll("button").forEach(b=>b.onclick=()=>{ $("#inp-hora").value=b.dataset.v;
