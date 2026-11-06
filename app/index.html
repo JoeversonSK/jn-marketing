@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --noite:#0B1650; --royal:#1C3AC4; --agua:#5EC8F2; --espuma:#EEF4FA;
+  --noite:#0B1650; --royal:#023AAB; --agua:#5EC8F2; --espuma:#EEF4FA;
   --linha:#D6E1EE; --tinta:#14204F; --suave:#5B6890;
   --ok:#0E9F6E; --ok-claro:#E3F6EE; --nao:#C8384F; --nao-claro:#FBE8EB;
   --raio-g:22px; --raio-p:12px;
@@ -30,7 +30,7 @@ button{cursor:pointer;border:0;background:none}
 .topo{background:var(--noite);color:#fff;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 0;position:sticky;top:0;z-index:5}
 .marca{display:flex;align-items:center;gap:12px}
 .selo{width:42px;height:42px;border-radius:50%;background:var(--royal);color:#fff;display:grid;place-items:center;font:700 17px Poppins,sans-serif;letter-spacing:-.5px;position:relative;flex:none}
-.selo::after{content:"";position:absolute;right:2px;top:3px;width:9px;height:12px;background:var(--agua);border-radius:50% 50% 50% 50%/60% 60% 40% 40%}
+img.selo{object-fit:cover;background:none;border:2px solid #fff}
 .marca h1{font:700 19px/1.1 Poppins,sans-serif}
 .marca p{font-size:13px;color:#B9C4EA}
 .abas{display:flex;gap:4px;margin-top:14px}
@@ -98,7 +98,7 @@ dialog::backdrop{background:rgba(11,22,80,.45)}
 <body>
 <header class="topo">
   <div class="marca">
-    <div class="selo" aria-hidden="true">JN</div>
+    <img class="selo" src="logo.png" alt="" aria-hidden="true">
     <div><h1>Aprovação de posts</h1><p>@jn_.higienizacao</p></div>
     <button class="engrenagem" id="cfg" aria-label="Configurações">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
@@ -235,7 +235,7 @@ function cartao(it){
   else if (st==="falhou") rodape=`<div class="status nao">Falhou ao publicar<button data-acao="tentar">Tentar de novo</button></div>`;
   else rodape=`<div class="status pub">Publicado no Instagram</div>`;
   return `<article class="post" data-nome="${it.nome}" data-pasta="${it.pasta}">
-    <div class="post-cab"><div class="selo" aria-hidden="true">JN</div><div><b>jn_.higienizacao</b><span>Juazeiro do Norte</span></div><span class="tipo">${TIPOS[d.tipo]||d.tipo}</span></div>
+    <div class="post-cab"><img class="selo" src="logo.png" alt="" aria-hidden="true"><div><b>jn_.higienizacao</b><span>Juazeiro do Norte</span></div><span class="tipo">${TIPOS[d.tipo]||d.tipo}</span></div>
     <div class="midia ${story?"r-story":"r-feed"}">${midia}</div>${pontos}
     <div class="corpo">
       <button class="quando" data-acao="${st==="publicado"?"":"hora"}" ${st==="publicado"?"disabled":""}>${dia}, ${h}<small>${st==="publicado"?"":"mudar"}</small></button>
