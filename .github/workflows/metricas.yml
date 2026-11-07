@@ -1,0 +1,37 @@
+name: Coletar métricas
+
+on:
+  workflow_dispatch:
+    inputs:
+      diagnostico:
+        description: "Mostrar métricas recusadas pela Meta"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: metricas
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Coletar
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python -m jn.metricas ${{ inputs.diagnostico && '--diagnostico' || '' }}
+      - name: Salvar
+        run: |
+          git config user.name "jn-robo"; git config user.email "jn-robo@users.noreply.github.com"
+          git add dados
+          git diff --cached --quiet || git commit -q -m "Robô: métricas"
+          for i in 1 2 3; do git pull -q --rebase -X theirs origin main && git push -q origin HEAD:main && break; sleep 4; done
