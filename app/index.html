@@ -36,6 +36,7 @@ img.selo{object-fit:cover;background:none;border:2px solid #fff}
 .abas{display:flex;gap:4px;margin-top:14px}
 .aba{flex:1;padding:11px 2px 13px;font-weight:600;font-size:13.5px;white-space:nowrap;color:#AEB9E2;border-bottom:3px solid transparent}
 .aba[aria-selected=true]{color:#fff;border-color:var(--agua)}
+.aba .n[hidden]{display:none}
 .aba .n{display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:10px;background:var(--agua);color:var(--noite);font-size:12px;line-height:20px}
 main{max-width:520px;margin:0 auto;padding:18px 14px calc(120px + var(--safe-b))}
 .vazio{text-align:center;padding:60px 18px;color:var(--suave)}
@@ -92,6 +93,45 @@ dialog::backdrop{background:rgba(11,22,80,.45)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .carregando{padding:50px 0;text-align:center;color:var(--suave)}
 .engrenagem{margin-left:auto;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#B9C4EA}
+
+/* ---------- Resultados ---------- */
+.res-topo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.res-topo small{color:var(--suave);font-size:13px}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--linha);border-radius:12px;padding:3px}
+.seg button{padding:7px 12px;border-radius:9px;font-weight:600;font-size:13.5px;color:var(--suave)}
+.seg button[aria-pressed=true]{background:var(--noite);color:#fff}
+.bloco{background:#fff;border-radius:var(--raio-g);padding:16px;margin-bottom:14px;box-shadow:0 1px 0 var(--linha)}
+.bloco h2{font:600 16px Poppins,sans-serif;margin-bottom:2px}
+.bloco .sub{font-size:13px;color:var(--suave);margin-bottom:12px}
+.heroi{display:flex;align-items:flex-end;gap:14px}
+.heroi .num{font:700 56px/1 Poppins,sans-serif;color:var(--noite);letter-spacing:-1px}
+.heroi .var{font-weight:600;font-size:14px;padding-bottom:8px}
+.var.sobe{color:var(--ok)} .var.igual{color:var(--suave)} .var.desce{color:var(--nao)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border-radius:18px;padding:14px;box-shadow:0 1px 0 var(--linha)}
+.kpi b{display:block;font:700 28px/1.1 Poppins,sans-serif;color:var(--noite)}
+.kpi span{font-size:13.5px;color:var(--suave)}
+.kpi.nd b{color:#9AA6C4;font-size:20px}
+.graf{position:relative}
+.graf svg{width:100%;height:auto;display:block;overflow:visible}
+.graf .tip{position:absolute;transform:translate(-50%,-100%);background:var(--noite);color:#fff;font-size:12.5px;font-weight:600;padding:5px 9px;border-radius:8px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s}
+.graf .tip.on{opacity:1}
+.ranking{list-style:none;padding:0;margin:0}
+.ranking li{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--espuma)}
+.ranking li:first-child{border-top:0}
+.ranking img{width:56px;height:70px;object-fit:cover;border-radius:10px;background:var(--espuma)}
+.ranking .t{font-size:14px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ranking .m{font-size:12.5px;color:var(--suave);margin-top:3px}
+.ranking .v{text-align:right}
+.ranking .v b{display:block;font:700 20px Poppins,sans-serif;color:var(--noite)}
+.ranking .v span{font-size:11.5px;color:var(--suave)}
+.ranking a{color:inherit;text-decoration:none}
+.chips{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center;font-size:14px}
+.chips b{font-weight:600}
+.chips span{display:flex;gap:6px;flex-wrap:wrap}
+.chips i{font-style:normal;background:#E6ECFD;color:var(--royal);font-weight:600;padding:3px 9px;border-radius:14px;font-size:13px}
+.chips i.hoje{background:var(--royal);color:#fff}
+.nota{font-size:13px;color:var(--suave);margin-top:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -105,9 +145,10 @@ dialog::backdrop{background:rgba(11,22,80,.45)}
     </button>
   </div>
   <nav class="abas" role="tablist">
-    <button class="aba" role="tab" data-aba="pendente" aria-selected="true">Para aprovar<span class="n" id="n-pend" hidden></span></button>
+    <button class="aba" role="tab" data-aba="pendente" aria-selected="true">Aprovar<span class="n" id="n-pend" hidden></span></button>
     <button class="aba" role="tab" data-aba="programado" aria-selected="false">Programados</button>
     <button class="aba" role="tab" data-aba="publicado" aria-selected="false">Publicados</button>
+    <button class="aba" role="tab" data-aba="resultados" aria-selected="false">Resultados</button>
   </nav>
 </header>
 
@@ -151,7 +192,7 @@ const REPO = "JoeversonSK/jn-marketing", BRANCH = "main";
 const RAW = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/`;
 const API = `https://api.github.com/repos/${REPO}/contents/`;
 const TIPOS = {post:"Post", carrossel:"Carrossel", reel:"Reel", story:"Story"};
-let aba = "pendente", itens = [], ocupado = false;
+let aba = "pendente", itens = [], ocupado = false, metricas = null, periodo = "7d";
 
 const $ = s => document.querySelector(s);
 const ler = k => { try { return localStorage.getItem(k) } catch { return null } };
@@ -194,8 +235,9 @@ function estado(it){
 async function carregar(){
   $("#lista").innerHTML='<div class="carregando">Carregando…</div>';
   try{
-    const [a,b] = await Promise.all([carregarPasta("conteudo"), carregarPasta("publicado")]);
-    itens = [...a, ...b];
+    const [a,b,m] = await Promise.all([carregarPasta("conteudo"), carregarPasta("publicado"),
+      gh("dados/metricas.json").then(f=>f?JSON.parse(b64dec(f.content)):null).catch(()=>null)]);
+    itens = [...a, ...b]; metricas = m;
     desenhar();
   }catch(e){ $("#lista").innerHTML=`<div class="vazio"><strong>Não deu para carregar</strong>${e.message}</div>` }
 }
@@ -245,6 +287,7 @@ function cartao(it){
 const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function desenhar(){
+  if (aba==="resultados") { const n=$("#n-pend"); const p=itens.filter(i=>estado(i)==="pendente").length; n.hidden=!p; n.textContent=p; $("#barra").hidden=true; return desenharResultados() }
   const pend = itens.filter(i=>estado(i)==="pendente");
   const n=$("#n-pend"); n.hidden=!pend.length; n.textContent=pend.length;
   let vis;
@@ -253,7 +296,7 @@ function desenhar(){
   else vis=itens.filter(i=>estado(i)==="publicado").reverse();
   vis.sort((a,b)=>aba==="publicado"?0:a.dados.publicar_em.localeCompare(b.dados.publicar_em));
   const vazio = {pendente:["Tudo aprovado","Quando tiver post novo, ele aparece aqui."],
-                 programado:["Nada programado","Aprove posts na aba Para aprovar."],
+                 programado:["Nada programado","Aprove posts na aba Aprovar."],
                  publicado:["Nada publicado ainda","Os posts publicados aparecem aqui."]}[aba];
   $("#lista").innerHTML = vis.length ? vis.map(cartao).join("") : `<div class="vazio"><strong>${vazio[0]}</strong>${vazio[1]}</div>`;
   $("#barra").hidden = !(aba==="pendente" && pend.length>1);
@@ -322,6 +365,108 @@ $("#d-hora").addEventListener("close", async e=>{
   const iso=$("#inp-hora").value+":00-03:00";
   await executar(null, ()=>salvar(d._it,{publicar_em:iso},"Horário mudado pelo app"), "Horário salvo.");
 });
+
+/* ---------- Resultados ---------- */
+const fmt = v => v==null ? "—" : Number(v).toLocaleString("pt-BR");
+const NOMES_DIA = {seg:"Segunda",ter:"Terça",qua:"Quarta",qui:"Quinta",sex:"Sexta",sab:"Sábado",dom:"Domingo"};
+const TIPO_IG = {feed:"Post",reels:"Reel",reel:"Reel",story:"Story",carousel_album:"Carrossel",image:"Post",video:"Vídeo"};
+
+function imagemPropria(mediaId){
+  const it = itens.find(i=>i.dados.media_id===mediaId);
+  if (!it) return null;
+  const d=it.dados, a=d.capa || d.arquivos.find(x=>/\.jpe?g$/i.test(x));
+  return a ? RAW+`${it.pasta}/${it.nome}/${a}` : null;
+}
+
+function grafBarras(pontos, rotulo){   // pontos: [{x:"dd/mm", v:n, dica:"..."}]
+  const W=340,H=150,pb=22,pt=8,n=pontos.length; if(!n) return "";
+  const max=Math.max(1,...pontos.map(p=>p.v||0)), passo=W/n, larg=Math.max(4,passo-2);
+  const y=v=>pt+(H-pb-pt)*(1-v/max);
+  const grade=[0.5,1].map(f=>`<line x1="0" x2="${W}" y1="${y(max*f)}" y2="${y(max*f)}" stroke="#E3EAF3" stroke-width="1"/><text x="${W}" y="${y(max*f)-4}" text-anchor="end" font-size="10" fill="#8A96B8">${fmt(Math.round(max*f))}</text>`).join("");
+  const barras=pontos.map((p,i)=>{
+    const x=i*passo+(passo-larg)/2, h=Math.max((H-pb-pt)*((p.v||0)/max),p.v?2:0), y0=H-pb, r=Math.min(4,larg/2,h);
+    const d = h? `M${x},${y0} V${y0-h+r} Q${x},${y0-h} ${x+r},${y0-h} H${x+larg-r} Q${x+larg},${y0-h} ${x+larg},${y0-h+r} V${y0} Z` : "";
+    return `<path d="${d}" fill="#023AAB"/><rect x="${i*passo}" y="0" width="${passo}" height="${H}" fill="transparent" data-tip="${esc(p.dica)}" data-cx="${x+larg/2}" data-cy="${y0-h}"/>`;
+  }).join("");
+  const cada=Math.ceil(n/6);
+  const eixo=pontos.map((p,i)=> i%cada===0||i===n-1 ? `<text x="${i*passo+passo/2}" y="${H-6}" text-anchor="middle" font-size="10" fill="#8A96B8">${p.x}</text>`:"").join("");
+  return `<div class="graf" role="img" aria-label="${esc(rotulo)}"><svg viewBox="0 0 ${W} ${H}">${grade}<line x1="0" x2="${W}" y1="${H-pb}" y2="${H-pb}" stroke="#C9D5E6"/>${barras}${eixo}</svg><div class="tip"></div></div>`;
+}
+
+function grafLinha(pontos, rotulo){
+  const W=340,H=130,pb=22,pt=14,n=pontos.length;
+  const vs=pontos.map(p=>p.v), min=Math.min(...vs), max=Math.max(...vs), faixa=Math.max(1,max-min);
+  const x=i=> n===1? W/2 : 6+(W-40)*i/(n-1), y=v=>pt+(H-pb-pt)*(1-(v-min)/faixa);
+  const linha=pontos.map((p,i)=>`${i?"L":"M"}${x(i)},${y(p.v)}`).join(" ");
+  const ult=pontos[n-1];
+  const alvos=pontos.map((p,i)=>`<rect x="${x(i)-12}" y="0" width="24" height="${H}" fill="transparent" data-tip="${esc(p.dica)}" data-cx="${x(i)}" data-cy="${y(p.v)}"/>`).join("");
+  const eixo=[0,n-1].filter((v,i,a)=>a.indexOf(v)===i).map(i=>`<text x="${x(i)}" y="${H-6}" text-anchor="${i?"end":"start"}" font-size="10" fill="#8A96B8">${pontos[i].x}</text>`).join("");
+  return `<div class="graf" role="img" aria-label="${esc(rotulo)}"><svg viewBox="0 0 ${W} ${H}"><line x1="0" x2="${W}" y1="${H-pb}" y2="${H-pb}" stroke="#C9D5E6"/>
+    <path d="${linha}" fill="none" stroke="#023AAB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${x(n-1)}" cy="${y(ult.v)}" r="4.5" fill="#023AAB" stroke="#fff" stroke-width="2"/>
+    <text x="${x(n-1)+8}" y="${y(ult.v)+4}" font-size="12" font-weight="700" fill="#14204F">${fmt(ult.v)}</text>${alvos}${eixo}</svg><div class="tip"></div></div>`;
+}
+
+function ligarDicas(raiz){
+  raiz.querySelectorAll(".graf").forEach(g=>{
+    const tip=g.querySelector(".tip"), svg=g.querySelector("svg");
+    const mostrar=e=>{ const r=e.target.closest("[data-tip]"); if(!r){tip.classList.remove("on");return}
+      const k=svg.getBoundingClientRect().width/svg.viewBox.baseVal.width;
+      tip.textContent=r.dataset.tip; tip.style.left=(r.dataset.cx*k)+"px"; tip.style.top=(r.dataset.cy*k-6)+"px"; tip.classList.add("on") };
+    svg.addEventListener("pointermove",mostrar); svg.addEventListener("pointerdown",mostrar);
+    svg.addEventListener("pointerleave",()=>tip.classList.remove("on"));
+  });
+}
+
+function desenharResultados(){
+  const m=metricas, L=$("#lista");
+  if(!m){ L.innerHTML=`<div class="vazio"><strong>Ainda sem números</strong>O robô coleta os resultados do Instagram de hora em hora. Volte daqui a pouco.</div>`; return }
+  const c=m.conta[periodo]||{}, hist=m.historico||[];
+  const seg=m.perfil.followers_count, dias=periodo==="7d"?7:28;
+  const base=[...hist].reverse().find(h=>(new Date(m.atualizado_em)-new Date(h.data+"T12:00:00-03:00"))/864e5>=dias-0.5) || hist[0];
+  const dif = base && base.data!==m.atualizado_em.slice(0,10) ? seg-base.seguidores : null;
+  const varTxt = dif==null ? "" : dif>0 ? `<span class="var sobe">+${dif} desde ${base.data.slice(8,10)}/${base.data.slice(5,7)}</span>` : dif<0 ? `<span class="var desce">${dif} desde ${base.data.slice(8,10)}/${base.data.slice(5,7)}</span>` : `<span class="var igual">igual a ${base.data.slice(8,10)}/${base.data.slice(5,7)}</span>`;
+  const kpi=(v,t)=>`<div class="kpi ${v==null?"nd":""}"><b>${v==null?"indisponível":fmt(v)}</b><span>${t}</span></div>`;
+  const quando=new Date(m.atualizado_em).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",timeZone:"America/Sao_Paulo"});
+
+  const serie=(m.series.reach||[]).slice(-dias).map(p=>({x:p.data.slice(8,10)+"/"+p.data.slice(5,7),v:p.valor,dica:`${p.data.slice(8,10)}/${p.data.slice(5,7)}: ${fmt(p.valor)} contas`}));
+  const histP=hist.map(h=>({x:h.data.slice(8,10)+"/"+h.data.slice(5,7),v:h.seguidores,dica:`${h.data.slice(8,10)}/${h.data.slice(5,7)}: ${fmt(h.seguidores)} seguidores`}));
+
+  const posts=[...m.posts].sort((a,b)=>(b.reach||0)-(a.reach||0));
+  const linhaPost=p=>{const img=imagemPropria(p.id)||p.imagem||"", d=new Date(p.data);
+    const dt=d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",timeZone:"America/Sao_Paulo"})+" às "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit",timeZone:"America/Sao_Paulo"});
+    const extra = p.navigation!=null ? `${fmt(p.views)} visualizações · ${fmt(p.navigation)} toques` : `${fmt(p.views)} visualizações · ${fmt(p.total_interactions)} interações`;
+    return `<li><a href="${p.link||"#"}" target="_blank" rel="noopener"><img src="${img}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"></a>
+      <div><div class="t">${esc(p.legenda||TIPO_IG[p.tipo]||"Story")}</div><div class="m">${p.tipo==="story"?"":(TIPO_IG[p.tipo]||"Post")+" · "}${dt}<br>${extra}</div></div>
+      <div class="v"><b>${fmt(p.reach)}</b><span>alcance</span></div></li>`};
+  const stories=(m.stories||[]).map(s=>({...s,tipo:"story",legenda:"Story"}));
+
+  let horas="";
+  const hz=m.horarios||{};
+  if (hz.por_hora){
+    const pts=[...Array(24).keys()].map(h=>({x:h+"h",v:hz.por_hora[h]||0,dica:`${h}h: ${fmt(hz.por_hora[h]||0)}`}));
+    horas=grafBarras(pts,"Atividade por horário")+`<p class="nota">Melhores horários: <b>${(hz.melhores||[]).map(h=>h+"h").join(", ")}</b>. Fonte: ${esc(hz.fonte)}.</p>`;
+  } else if (hz.por_dia){
+    const hoje=["dom","seg","ter","qua","qui","sex","sab"][new Date().getDay()];
+    horas=`<div class="chips">${["seg","ter","qua","qui","sex","sab","dom"].map(d=>`<b>${NOMES_DIA[d]}</b><span>${hz.por_dia[d].map(h=>`<i class="${d===hoje?"hoje":""}">${h}h</i>`).join("")}</span>`).join("")}</div>
+      <p class="nota">Por enquanto usamos a média geral do Instagram no Brasil. Com 100 seguidores, a Meta libera o horário em que os <b>seus</b> seguidores estão online, e esta lista passa a ser só da JN.</p>`;
+  }
+
+  L.innerHTML=`
+    <div class="res-topo"><small>Atualizado ${quando}</small>
+      <div class="seg" role="group" aria-label="Período"><button data-per="7d" aria-pressed="${periodo==="7d"}">7 dias</button><button data-per="28d" aria-pressed="${periodo==="28d"}">28 dias</button></div></div>
+    <section class="bloco"><h2>Seguidores</h2><div class="heroi"><span class="num">${fmt(seg)}</span>${varTxt}</div>
+      ${histP.length>1 ? grafLinha(histP,"Seguidores por dia") : `<p class="nota">O gráfico de seguidores começa a aparecer a partir de amanhã, quando tivermos dois dias de dados.</p>`}</section>
+    <div class="kpis">${kpi(c.reach,"Contas alcançadas")}${kpi(c.views,"Visualizações")}${kpi(c.profile_views,"Visitas ao perfil")}${kpi(c.profile_links_taps,"Toques no link da bio")}</div>
+    ${serie.length?`<section class="bloco"><h2>Contas alcançadas por dia</h2><p class="sub">Toque numa barra para ver o número.</p>${grafBarras(serie,"Contas alcançadas por dia")}</section>`:""}
+    <section class="bloco"><h2>Posts e Reels</h2><p class="sub">Do maior para o menor alcance.</p>
+      ${posts.length?`<ul class="ranking">${posts.slice(0,8).map(linhaPost).join("")}</ul>`:`<p class="nota">Nenhum post ainda.</p>`}</section>
+    ${stories.length?`<section class="bloco"><h2>Stories das últimas 24 horas</h2><p class="sub">Toques = pessoas que avançaram, voltaram ou saíram.</p><ul class="ranking">${stories.map(linhaPost).join("")}</ul></section>`:""}
+    <section class="bloco"><h2>Melhores horários para postar</h2><p class="sub">O sistema programa os posts nesses horários.</p>${horas}</section>`;
+  L.querySelectorAll("[data-per]").forEach(b=>b.onclick=()=>{periodo=b.dataset.per; desenharResultados()});
+  ligarDicas(L);
+}
+
 function montarAtalhos(){
   const hojeBR = new Date(Date.now()-3*3600e3);
   const dia = n => { const d=new Date(hojeBR.getTime()+n*864e5); return d.toISOString().slice(0,10) };

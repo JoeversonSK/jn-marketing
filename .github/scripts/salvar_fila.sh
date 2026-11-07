@@ -7,6 +7,7 @@ git config user.email "jn-robo@users.noreply.github.com"
 git checkout -- FILA.md 2>/dev/null || true
 git add -A conteudo
 [ -d publicado ] && git add -A publicado
+[ -d dados ] && git add -A dados
 git diff --cached --quiet || git commit -q -m "Robô: fila atualizada"
 for i in 1 2 3 4 5; do
   git pull -q --rebase -X theirs origin main || { git rebase --abort 2>/dev/null; sleep 3; continue; }
